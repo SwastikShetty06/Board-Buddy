@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Fredoka', system-ui, -apple-system, sans-serif;
+  --shadow-playful: 0 20px 50px rgba(0, 0, 0, 0.05);
+  --shadow-playful-hover: 0 40px 100px rgba(0, 0, 0, 0.08);
+  --shadow-sunset: 0 10px 25px rgba(255, 107, 149, 0.3);
+}
+
+:root {
+  color-scheme: light;
+  --pastel-lavender: #f0f0ff;
+  --pastel-yellow: #fffdf0;
+  --pastel-blue: #f0f9ff;
+  --pastel-green: #f0fff4;
+  --pastel-pink: #fff0f5;
+  --sunset-orange: #ff9d6c;
+  --sunset-pink: #ff6b95;
+}
+
+body {
+  @apply bg-white text-slate-800 antialiased overflow-x-hidden;
+  font-family: var(--font-sans);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-50;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full border-2 border-slate-50 hover:bg-slate-300 transition-colors;
+}
+
+/* Selection */
+::selection {
+  @apply bg-indigo-100 text-indigo-900;
+}
+
+/* Utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 3D and Animations */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Playful Card Style */
+.playful-card {
+  @apply bg-white rounded-[2.5rem] border-0 transition-all duration-500;
+  box-shadow: var(--shadow-playful);
+}
+
+.playful-card:hover {
+  box-shadow: var(--shadow-playful-hover);
+}
+
+/* Sunset Gradient Button */
+.btn-sunset {
+  @apply bg-gradient-to-r from-[#ff9d6c] to-[#ff6b95] text-white font-bold rounded-full transition-all duration-300;
+  box-shadow: var(--shadow-sunset);
+}
+
+.btn-sunset:hover {
+  @apply scale-105;
+}
+
+/* Dice Shapes */
+.triangle-clip {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  padding-top: 15%;
+}
+
+.kite-clip {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+.dodeca-clip {
+  clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
+}
+
+.hex-clip {
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+@keyframes roll {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  25% {
+    transform: rotate(90deg) scale(0.9);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+
+  75% {
+    transform: rotate(270deg) scale(0.9);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+.animate-roll {
+  animation: roll 0.5s ease-in-out infinite;
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  70% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
