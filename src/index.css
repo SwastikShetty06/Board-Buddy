@@ -1,8 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import "tailwindcss";
 
-@variant dark (&:where(.dark, .dark *));
-
 @theme {
   --font-sans: 'Fredoka', system-ui, -apple-system, sans-serif;
   --font-mono: 'Space Mono', monospace;
@@ -18,6 +16,8 @@
   --shadow-brutal: 4px 4px 0px 0px rgba(0, 0, 0, 1);
   --shadow-brutal-lg: 8px 8px 0px 0px rgba(0, 0, 0, 1);
   --shadow-brutal-hover: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+
+  --dark-mode: selector;
 }
 
 :root {

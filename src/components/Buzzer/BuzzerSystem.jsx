@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Zap, Trophy } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -6,6 +6,7 @@ import confetti from 'canvas-confetti';
 const Buzzer = () => {
     const [winner, setWinner] = useState(null);
     const [locked, setLocked] = useState(false);
+    const buzzerLock = useRef(false);
 
     const colors = [
         { id: 0, bg: 'bg-[#FF66AA]', name: 'PINK', active: 'bg-[#FF4488]' },
@@ -15,8 +16,8 @@ const Buzzer = () => {
     ];
 
     const buzz = (id) => {
-        if (winner !== null || locked) return;
-
+        if (buzzerLock.current || winner !== null) return;
+        buzzerLock.current = true;
         setWinner(id);
 
         // Dynamic confetti based on winner color
@@ -34,6 +35,7 @@ const Buzzer = () => {
     };
 
     const reset = () => {
+        buzzerLock.current = false;
         setWinner(null);
         setLocked(false);
     };
