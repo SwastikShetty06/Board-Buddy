@@ -1,27 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { RefreshCw, Zap, Trophy } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 const Buzzer = () => {
     const [winner, setWinner] = useState(null);
     const [locked, setLocked] = useState(false);
 
     const colors = [
-        { id: 0, bg: 'bg-red-500', name: 'Red', active: 'bg-red-600 shadow-red-500' },
-        { id: 1, bg: 'bg-blue-500', name: 'Blue', active: 'bg-blue-600 shadow-blue-500' },
-        { id: 2, bg: 'bg-green-500', name: 'Green', active: 'bg-green-600 shadow-green-500' },
-        { id: 3, bg: 'bg-yellow-500', name: 'Yellow', active: 'bg-yellow-600 shadow-yellow-500' }
+        { id: 0, bg: 'bg-[#FF66AA]', name: 'PINK', active: 'bg-[#FF4488]' },
+        { id: 1, bg: 'bg-[#00E1FF]', name: 'BLUE', active: 'bg-[#00CCEE]' },
+        { id: 2, bg: 'bg-[#33FF77]', name: 'GREEN', active: 'bg-[#22EE66]' },
+        { id: 3, bg: 'bg-[#FFD21E]', name: 'YELLOW', active: 'bg-[#EEBB11]' }
     ];
 
     const buzz = (id) => {
         if (winner !== null || locked) return;
 
         setWinner(id);
+
+        // Dynamic confetti based on winner color
+        confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 },
+            colors: [colors[id].bg.replace('bg-[', '').replace(']', '')]
+        });
+
         const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-game-show-buzzer-996.mp3');
         audio.play().catch(e => console.log('Audio error:', e));
 
-        // Lockout timer (optional, just to prevent instant resets)
         setLocked(true);
-        setTimeout(() => setLocked(false), 3000);
     };
 
     const reset = () => {
@@ -30,40 +39,69 @@ const Buzzer = () => {
     };
 
     return (
-        <div className="fixed inset-0 top-20 bg-slate-900 select-none">
-            {winner !== null ? (
-                // Winner Screen
-                <div className={`w-full h-full flex flex-col items-center justify-center ${colors[winner].bg} animate-in fade-in zoom-in duration-300`}>
-                    <h1 className="text-8xl font-black text-white uppercase tracking-tighter drop-shadow-xl mb-8">
-                        {colors[winner].name} Wins!
-                    </h1>
-                    <button
-                        onClick={reset}
-                        className="px-12 py-4 bg-white text-slate-900 font-bold text-2xl rounded-full shadow-2xl transition-transform active:scale-95 flex items-center gap-3"
+        <div className="fixed inset-0 top-16 md:top-20 bg-white dark:bg-black select-none z-40">
+            <AnimatePresence mode="wait">
+                {winner !== null ? (
+                    <motion.div
+                        key="winner"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.2 }}
+                        className={`w-full h-full flex flex-col items-center justify-center ${colors[winner].bg} p-8`}
                     >
-                        <RefreshCw className="w-8 h-8" />
-                        Reset Buzzer
-                    </button>
-                </div>
-            ) : (
-                // Buzzer Zones
-                <div className="w-full h-full grid grid-cols-2 grid-rows-2">
-                    {colors.map((color) => (
-                        <div
-                            key={color.id}
-                            className={`${color.bg} flex items-center justify-center active:scale-95 transition-transform duration-100 cursor-pointer touch-manipulation`}
-                            onPointerDown={() => buzz(color.id)}
+                        <motion.div
+                            initial={{ y: 50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="flex flex-col items-center"
                         >
-                            <Zap className="w-24 h-24 text-white/50" />
-                        </div>
-                    ))}
+                            <div className="bg-white border-[6px] border-black p-10 shadow-[15px_15px_0px_0px_rgba(0,0,0,1)] mb-12">
+                                <Trophy className="w-32 h-32 md:w-48 md:h-48 text-black" />
+                            </div>
 
-                    {/* Instructions Overlay */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/80 backdrop-blur text-white px-6 py-3 rounded-full pointer-events-none">
-                        Tap your zone to buzz in!
-                    </div>
-                </div>
-            )}
+                            <h1 className="text-6xl md:text-9xl font-black text-black uppercase tracking-tighter italic leading-none mb-12 text-center drop-shadow-[4px_4px_0px_rgba(255,255,255,0.5)]">
+                                {colors[winner].name} WON!
+                            </h1>
+
+                            <button
+                                onClick={reset}
+                                className="brutal-button bg-white text-black px-12 py-6 text-2xl hover:bg-black hover:text-white transition-all shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+                            >
+                                RESET BUZZER
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="grid"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="w-full h-full grid grid-cols-2 grid-rows-2 p-4 gap-4 bg-white dark:bg-black"
+                    >
+                        {colors.map((color) => (
+                            <motion.button
+                                key={color.id}
+                                whileTap={{ scale: 0.95 }}
+                                className={`
+                                    ${color.bg} border-[6px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]
+                                    flex items-center justify-center relative overflow-hidden group
+                                `}
+                                onPointerDown={() => buzz(color.id)}
+                            >
+                                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <Zap className="w-16 h-16 md:w-32 md:h-32 text-black opacity-30 group-hover:scale-125 transition-transform" />
+                                <span className="absolute bottom-4 left-6 text-2xl font-black italic text-black opacity-50">{color.name}</span>
+                            </motion.button>
+                        ))}
+
+                        {/* Instructions Overlay */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-black border-[4px] border-black dark:border-white text-black dark:text-white px-8 py-4 font-black uppercase tracking-widest text-xs rotate-[-2deg] pointer-events-none z-10 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]">
+                            Tap your zone to buzz in!
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

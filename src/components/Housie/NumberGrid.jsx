@@ -1,11 +1,12 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const NumberGrid = ({ callHistory, currentNumber }) => {
     const numbers = Array.from({ length: 90 }, (_, i) => i + 1);
 
     return (
-        <div className="bg-white rounded-[3.5rem] p-10 shadow-[0_20px_60px_rgba(0,0,0,0.03)] border-8 border-slate-50 relative overflow-hidden h-full flex flex-col">
-            <div className="grid grid-cols-5 md:grid-cols-10 gap-1 md:gap-3 flex-grow content-start">
+        <div className="bg-white dark:bg-black border-[4px] border-black dark:border-white p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] relative overflow-hidden h-full">
+            <div className="grid grid-cols-5 md:grid-cols-10 gap-2 flex-grow content-start">
                 {numbers.map((number) => {
                     const isCalled = callHistory.includes(number);
                     const isCurrent = currentNumber === number;
@@ -14,17 +15,30 @@ const NumberGrid = ({ callHistory, currentNumber }) => {
                         <div
                             key={number}
                             className={`
-                                aspect-square flex items-center justify-center rounded-2xl text-sm md:text-base font-black transition-all duration-500 relative group
+                                aspect-square flex items-center justify-center border-[2px] border-black transition-all duration-300 relative overflow-hidden
                                 ${isCurrent
-                                    ? 'bg-purple-600 text-white scale-110 z-10 shadow-lg shadow-purple-200'
+                                    ? 'bg-[#FFD21E] text-black scale-110 z-10 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
                                     : isCalled
-                                        ? 'bg-purple-100 text-purple-600'
-                                        : 'bg-slate-50 text-slate-300 hover:bg-slate-100/50 hover:text-slate-400'}
+                                        ? 'bg-[#33FF77] text-black'
+                                        : 'bg-white dark:bg-zinc-900 text-black/20 dark:text-white/10'}
                             `}
                         >
-                            <span className={isCurrent ? 'animate-bounce' : ''}>
+                            <span className={`font-scoreboard font-black text-sm md:text-base ${isCurrent ? 'scale-110' : ''}`}>
                                 {number}
                             </span>
+
+                            {/* Stamp Overlay for called numbers */}
+                            <AnimatePresence>
+                                {isCalled && !isCurrent && (
+                                    <motion.div
+                                        initial={{ scale: 3, opacity: 0, rotate: -45 }}
+                                        animate={{ scale: 1, opacity: 0.2, rotate: -15 }}
+                                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                                    >
+                                        <div className="w-8 h-8 rounded-full border-[2px] border-black flex items-center justify-center font-black text-[10px]">OK</div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     );
                 })}

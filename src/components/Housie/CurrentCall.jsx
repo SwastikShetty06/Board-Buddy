@@ -1,44 +1,42 @@
 import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CurrentCall = ({ currentNumber }) => {
-    const [animationKey, setAnimationKey] = useState(0);
-
-    useEffect(() => {
-        if (currentNumber) {
-            setAnimationKey(k => k + 1);
-        }
-    }, [currentNumber]);
-
     return (
-        <div className="relative flex flex-col items-center justify-center p-12 bg-purple-50 rounded-[3.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.03)] min-h-[350px] w-full group overflow-hidden border-8 border-white">
-            <div className="absolute top-10 left-10 w-24 h-24 bg-white/50 blur-[60px] rounded-full" />
-
-            <h2 className="relative z-10 text-purple-400 font-black tracking-[0.2em] text-[0.7rem] uppercase mb-6">
+        <div className="relative flex flex-col items-center justify-center p-8 bg-[#9D7AFF] border-[4px] border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] min-h-[350px] w-full group overflow-hidden">
+            <h2 className="relative z-10 text-black font-black tracking-[0.2em] text-[10px] uppercase mb-4 bg-white px-3 py-1 border-[2px] border-black italic">
                 Now Calling
             </h2>
 
-            {currentNumber ? (
-                <div
-                    key={animationKey}
-                    className="relative z-10 flex flex-col items-center animate-bounce-in"
-                >
-                    <span className="text-[12rem] md:text-[14rem] font-[900] text-purple-600 tracking-tighter leading-none drop-shadow-sm">
-                        {currentNumber}
-                    </span>
-                    <div className="h-2 w-32 bg-purple-200 rounded-full mt-6" />
-                </div>
-            ) : (
-                <div className="relative z-10 flex flex-col items-center opacity-40">
-                    <span className="text-[10rem] font-[900] text-purple-200">??</span>
-                    <p className="text-purple-300 font-bold uppercase tracking-widest text-xs">Waiting for draw</p>
-                </div>
-            )}
+            <AnimatePresence mode="wait">
+                {currentNumber ? (
+                    <motion.div
+                        key={currentNumber}
+                        initial={{ scale: 0.5, rotate: -20, opacity: 0 }}
+                        animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                        exit={{ scale: 1.5, rotate: 10, opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                        className="relative z-10 flex flex-col items-center"
+                    >
+                        <span className="text-[10rem] md:text-[14rem] font-scoreboard font-[900] text-black tracking-tighter leading-none drop-shadow-[4px_4px_0px_rgba(255,255,255,1)]">
+                            {currentNumber}
+                        </span>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 0.3 }}
+                        className="relative z-10 flex flex-col items-center"
+                    >
+                        <span className="text-[10rem] font-black text-black">??</span>
+                        <p className="text-black font-black uppercase tracking-widest text-[10px]">Waiting for draw</p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            {/* Decorative Dots */}
-            <div className="absolute bottom-10 right-10 grid grid-cols-2 gap-2 opacity-10">
-                {[...Array(4)].map((_, i) => (
-                    <div key={i} className="w-3 h-3 bg-purple-400 rounded-full" />
-                ))}
+            {/* Decorative Grid */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none"
+                style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
             </div>
         </div>
     );

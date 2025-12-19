@@ -98,42 +98,40 @@ const HousieGame = () => {
     }, [isAutoPlaying, callNextNumber, autoPlaySpeed]);
 
     return (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <div className="max-w-6xl mx-auto px-4">
             {/* Header / Toolbar */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                 <div>
-                    <h1 className="text-5xl font-[900] text-slate-800 tracking-tight mb-2">Housie Picker</h1>
-                    <p className="text-slate-400 font-medium">Automatic number caller for your physical bingo cards.</p>
+                    <h1 className="text-5xl md:text-7xl font-black text-black dark:text-white tracking-tighter uppercase italic leading-none mb-4">Housie Picker</h1>
+                    <p className="text-black/50 dark:text-white/40 font-bold uppercase tracking-widest text-xs">Automatic caller for your physical bingo cards.</p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                     <button
                         onClick={() => setIsMuted(!isMuted)}
-                        className={`w-14 h-14 flex items-center justify-center rounded-[1.5rem] transition-all duration-300 ${isMuted ? 'bg-rose-50 text-rose-500' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
-                        title={isMuted ? 'Unmute voice' : 'Mute voice'}
+                        className={`w-14 h-14 border-[3px] border-black dark:border-white transition-all ${isMuted ? 'bg-[#FF66AA] text-black' : 'bg-white dark:bg-black text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black'}`}
                     >
                         {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
                     </button>
 
                     <button
                         onClick={resetGame}
-                        className="w-14 h-14 flex items-center justify-center bg-slate-50 text-slate-400 hover:bg-slate-100 rounded-[1.5rem] transition-all duration-300"
-                        title="Reset game"
+                        className="w-14 h-14 bg-white dark:bg-black border-[3px] border-black dark:border-white text-black dark:text-white hover:bg-[#FF8800] hover:text-black transition-all"
                     >
                         <RotateCcw className="w-6 h-6" />
                     </button>
 
                     <button
                         onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-                        className={`px-8 h-14 flex items-center gap-3 rounded-[1.5rem] font-black uppercase tracking-widest text-xs transition-all duration-500 ${isAutoPlaying ? 'bg-rose-50 text-rose-600' : 'bg-green-50 text-green-600 hover:scale-105'}`}
+                        className={`px-6 h-14 border-[3px] border-black dark:border-white font-black uppercase text-xs transition-all ${isAutoPlaying ? 'bg-[#FF66AA] text-black' : 'bg-[#33FF77] text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] active:translate-x-1 active:translate-y-1 active:shadow-none'}`}
                     >
-                        {isAutoPlaying ? <><Pause className="w-5 h-5" /> Stop Auto</> : <><Play className="w-5 h-5" /> Start Auto</>}
+                        {isAutoPlaying ? "Stop Auto" : "Start Auto"}
                     </button>
 
                     <button
                         onClick={callNextNumber}
                         disabled={isAutoPlaying || callHistory.length >= 90}
-                        className="btn-sunset px-10 h-14 flex items-center gap-3 text-sm disabled:opacity-50 disabled:scale-100"
+                        className="brutal-button bg-[#FFD21E] px-8 h-14 text-sm disabled:opacity-50 disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-none"
                     >
                         Draw Next <ChevronRight className="w-5 h-5" />
                     </button>
@@ -146,60 +144,52 @@ const HousieGame = () => {
                 <div className="lg:col-span-4 flex flex-col gap-8">
                     <CurrentCall currentNumber={currentNumber} />
 
-                    <div className="bg-white p-8 rounded-[3.5rem] border-8 border-slate-50 shadow-[0_20px_60px_rgba(0,0,0,0.03)] flex-1">
-                        <h3 className="text-slate-400 font-black mb-6 text-[0.7rem] uppercase tracking-[0.2em]">Game Stats</h3>
+                    <div className="bg-white dark:bg-black border-[4px] border-black dark:border-white p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)]">
+                        <h3 className="text-black dark:text-white font-black mb-6 text-xs uppercase tracking-[0.2em] italic underline underline-offset-4">Game Stats</h3>
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="p-6 bg-slate-50 rounded-[2rem] border border-white">
-                                <p className="text-slate-400 text-[0.6rem] font-black uppercase tracking-widest mb-1">Drawn</p>
-                                <p className="text-3xl font-black text-slate-800">{callHistory.length}<span className="text-slate-300 text-sm">/90</span></p>
+                            <div className="p-4 bg-white dark:bg-black border-[2px] border-black dark:border-white">
+                                <p className="text-black/40 dark:text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Drawn</p>
+                                <p className="text-4xl font-scoreboard font-black text-black dark:text-white">{callHistory.length}<span className="text-black/20 dark:text-white/20 text-sm">/90</span></p>
                             </div>
-                            <div className="p-6 bg-slate-50 rounded-[2rem] border border-white">
-                                <p className="text-slate-400 text-[0.6rem] font-black uppercase tracking-widest mb-1">Left</p>
-                                <p className="text-3xl font-black text-slate-800">{90 - callHistory.length}</p>
+                            <div className="p-4 bg-white dark:bg-black border-[2px] border-black dark:border-white">
+                                <p className="text-black/40 dark:text-white/40 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Left</p>
+                                <p className="text-4xl font-scoreboard font-black text-black dark:text-white">{90 - callHistory.length}</p>
                             </div>
                         </div>
 
-                        <div className="mt-8 space-y-3">
+                        <div className="mt-8 space-y-4">
                             {/* Speed Selection */}
-                            <div className="flex items-center gap-4 p-4 bg-indigo-50/50 rounded-full">
-                                <div className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-black">
-                                    <Settings className="w-5 h-5" />
-                                </div>
-                                <div className="flex-1">
-                                    <select
-                                        className="w-full bg-transparent text-xs font-black text-indigo-600 focus:outline-none appearance-none"
-                                        onChange={(e) => setAutoPlaySpeed(Number(e.target.value))}
-                                        value={autoPlaySpeed}
-                                    >
-                                        <option value={3000}>3s Fast Draw</option>
-                                        <option value={5000}>5s Normal Draw</option>
-                                        <option value={10000}>10s Relaxed Draw</option>
-                                    </select>
-                                </div>
+                            <div className="flex items-center gap-4 p-2 border-[2px] border-black dark:border-white bg-[#00E1FF]">
+                                <Settings className="w-5 h-5 text-black ml-2" />
+                                <select
+                                    className="w-full bg-transparent text-sm font-black text-black focus:outline-none appearance-none cursor-pointer"
+                                    onChange={(e) => setAutoPlaySpeed(Number(e.target.value))}
+                                    value={autoPlaySpeed}
+                                >
+                                    <option value={3000}>3S SPEEDY</option>
+                                    <option value={5000}>5S NORMAL</option>
+                                    <option value={10000}>10S CHILL</option>
+                                </select>
                             </div>
 
                             {/* Voice Selection */}
-                            <div className="flex items-center gap-4 p-4 bg-purple-50/50 rounded-full">
-                                <div className="w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-black">
-                                    <Volume2 className="w-5 h-5" />
-                                </div>
-                                <div className="flex-1 overflow-hidden">
-                                    <select
-                                        className="w-full bg-transparent text-xs font-black text-purple-600 focus:outline-none appearance-none truncate"
-                                        onChange={handleVoiceChange}
-                                        value={selectedVoice?.name || ''}
-                                    >
-                                        {voices.length === 0 ? (
-                                            <option value="">No English Voices</option>
-                                        ) : (
-                                            voices.map(voice => (
-                                                <option key={voice.name} value={voice.name}>
-                                                    {voice.name.replace('Google ', '').split(' (')[0]}
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
-                                </div>
+                            <div className="flex items-center gap-4 p-2 border-[2px] border-black dark:border-white bg-[#9D7AFF]">
+                                <Volume2 className="w-5 h-5 text-black ml-2" />
+                                <select
+                                    className="w-full bg-transparent text-sm font-black text-black focus:outline-none appearance-none cursor-pointer truncate"
+                                    onChange={handleVoiceChange}
+                                    value={selectedVoice?.name || ''}
+                                >
+                                    {voices.length === 0 ? (
+                                        <option value="">NO VOICES</option>
+                                    ) : (
+                                        voices.map(voice => (
+                                            <option key={voice.name} value={voice.name}>
+                                                {voice.name.replace('Google ', '').split(' (')[0].toUpperCase()}
+                                            </option>
+                                        ))
+                                    )}
+                                </select>
                             </div>
                         </div>
                     </div>

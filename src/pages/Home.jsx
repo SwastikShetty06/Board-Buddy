@@ -1,46 +1,42 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Trophy, Hand, Timer, Grid3X3, Dices, Users, Heart, Coins, Zap, Layers, Sparkles, ChevronRight, Gamepad2, ArrowRight } from 'lucide-react';
 
 const ToolCard = ({ tool }) => {
-    const { to, title, description, icon: Icon, color, delay, span } = tool;
-
-    // Playful color map
-    const colorMap = {
-        'bg-purple-50': 'text-purple-600',
-        'bg-yellow-50': 'text-yellow-600',
-        'bg-blue-50': 'text-blue-600',
-        'bg-green-50': 'text-green-600',
-        'bg-pink-50': 'text-pink-600',
-        'bg-orange-50': 'text-orange-600',
-        'bg-rose-50': 'text-rose-600',
-        'bg-emerald-50': 'text-emerald-600',
-        'bg-amber-50': 'text-amber-600',
-        'bg-indigo-50': 'text-indigo-600',
-    };
-
-    const textColor = colorMap[color] || 'text-indigo-600';
+    const { to, title, description, icon: Icon, color, delay } = tool;
 
     return (
-        <Link
-            to={to}
-            className={`group relative flex flex-col items-center text-center playful-card p-10 hover:-translate-y-2 ${span || ''} ${color}`}
-            style={{ animationDelay: `${delay}ms` }}
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: delay / 1000 }}
+            whileHover={{ y: -8, x: -8 }}
+            className="h-full"
         >
-            <div className={`w-20 h-20 rounded-[2rem] flex items-center justify-center mb-6 bg-white shadow-sm border border-white/50 group-hover:scale-110 transition-transform duration-500`}>
-                <Icon className={`w-10 h-10 ${textColor}`} />
-            </div>
+            <Link
+                to={to}
+                className="group relative flex flex-col items-center text-center bg-white dark:bg-black border-[4px] border-black dark:border-white p-8 h-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] hover:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[16px_16px_2px_rgba(255,255,255,1)] transition-all"
+            >
+                <div className={`w-16 h-16 border-[4px] border-black flex items-center justify-center mb-6 ${color} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:rotate-12 transition-transform`}>
+                    <Icon className="w-8 h-8 text-black" />
+                </div>
 
-            <h3 className="text-2xl font-[900] text-slate-800 mb-3 tracking-tight">
-                {title}
-            </h3>
+                <h3 className="text-xl font-black text-black dark:text-white mb-3 tracking-tighter uppercase italic">
+                    {title}
+                </h3>
 
-            <p className="text-slate-500 text-sm leading-relaxed mb-6 font-medium">
-                {description}
-            </p>
+                <p className="text-black/50 dark:text-white/40 text-xs leading-tight mb-6 font-bold uppercase tracking-wider">
+                    {description}
+                </p>
 
-            <Icon className="absolute bottom-4 right-4 w-24 h-24 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-700 -rotate-12" />
-        </Link>
+                <div className="mt-auto pt-4 w-full border-t-[3px] border-black/10 dark:border-white/10 flex justify-center group-hover:border-black dark:group-hover:border-white transition-colors">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 text-black dark:text-white">
+                        Launch <ChevronRight className="w-4 h-4" />
+                    </span>
+                </div>
+            </Link>
+        </motion.div>
     );
 };
 
@@ -51,7 +47,7 @@ const Home = () => {
             title: "Housie Picker",
             description: "Friendly bingo caller for family game nights.",
             icon: Grid3X3,
-            color: "bg-purple-50",
+            color: "bg-[#9D7AFF]",
             delay: 100
         },
         {
@@ -59,7 +55,7 @@ const Home = () => {
             title: "3D Dice Roller",
             description: "Roll the dice with a single friendly tap!",
             icon: Dices,
-            color: "bg-yellow-50",
+            color: "bg-[#FFD21E]",
             delay: 200
         },
         {
@@ -67,7 +63,7 @@ const Home = () => {
             title: "Scorekeeper",
             description: "Keep track of winners and high scores easily.",
             icon: Trophy,
-            color: "bg-blue-50",
+            color: "bg-[#00E1FF]",
             delay: 300
         },
         {
@@ -75,7 +71,7 @@ const Home = () => {
             title: "Who Goes First?",
             description: "Let the app decide who starts the fun.",
             icon: Hand,
-            color: "bg-green-50",
+            color: "bg-[#33FF77]",
             delay: 400
         },
         {
@@ -83,7 +79,7 @@ const Home = () => {
             title: "Game Timer",
             description: "Stay on track with our friendly game clock.",
             icon: Timer,
-            color: "bg-pink-50",
+            color: "bg-[#FF66AA]",
             delay: 500
         },
         {
@@ -91,7 +87,7 @@ const Home = () => {
             title: "Team Builder",
             description: "Shuffle teams fairly for everyone to play.",
             icon: Users,
-            color: "bg-orange-50",
+            color: "bg-[#FF8800]",
             delay: 600
         },
         {
@@ -99,7 +95,7 @@ const Home = () => {
             title: "Life Counter",
             description: "Track your health in competitive card duels.",
             icon: Heart,
-            color: "bg-rose-50",
+            color: "bg-[#FF6B95]",
             delay: 700
         },
         {
@@ -107,7 +103,7 @@ const Home = () => {
             title: "Coin Flipper",
             description: "Heads or Tails? Flip the magic coin.",
             icon: Coins,
-            color: "bg-emerald-50",
+            color: "bg-[#00FFCC]",
             delay: 800
         },
         {
@@ -115,7 +111,7 @@ const Home = () => {
             title: "Quiz Buzzer",
             description: "Be the first to buzz in for game shows!",
             icon: Zap,
-            color: "bg-amber-50",
+            color: "bg-[#FFCC00]",
             delay: 900
         },
         {
@@ -123,7 +119,7 @@ const Home = () => {
             title: "Card Dealer",
             description: "Draw cards from a complete virtual deck.",
             icon: Layers,
-            color: "bg-indigo-50",
+            color: "bg-[#BB88FF]",
             delay: 1000
         }
     ];
@@ -132,45 +128,55 @@ const Home = () => {
         <div className="relative">
             {/* Split Hero Section */}
             <section className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 pt-10 pb-24">
-                {/* Illustration */}
-                <div className="w-full lg:w-1/2 relative group">
-                    <div className="absolute inset-0 bg-indigo-50 rounded-[3rem] -rotate-3 scale-105 opacity-50 -z-10 group-hover:rotate-0 transition-transform duration-700" />
-                    <img
-                        src="https://thumbs.dreamstime.com/b/friends-playing-board-game-vector-illustration-157695303.jpg"
-                        alt="Friends playing games"
-                        className="w-full h-auto rounded-[3rem] shadow-2xl relative z-10"
-                    />
-                    <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg z-20 animate-bounce">
-                        <Sparkles className="w-10 h-10 text-yellow-400" />
-                    </div>
-                </div>
-
                 {/* Content */}
-                <div className="w-full lg:w-1/2 text-center lg:text-left">
-                    <h1 className="text-6xl md:text-8xl font-[900] tracking-tight text-slate-800 mb-6 leading-[0.9]">
-                        Level Up Your<br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff9d6c] to-[#ff6b95]">
+                <div className="w-full lg:w-1/2 text-center lg:text-left order-2 lg:order-1 relative z-10">
+                    <motion.h1
+                        initial={{ x: -100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        className="text-6xl md:text-9xl font-black tracking-tighter text-black dark:text-white mb-6 leading-[0.8] uppercase italic"
+                    >
+                        Level Up<br />
+                        <span className="bg-[#FFD21E] dark:bg-[#FFD21E] text-black px-4 py-2 border-[6px] border-black dark:border-white inline-block mt-4 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] rotate-[-2deg] hover:rotate-[0deg] transition-transform cursor-default">
                             Game Night
                         </span>
-                    </h1>
+                    </motion.h1>
 
-                    <p className="text-xl text-slate-500 max-w-xl mb-10 font-medium leading-relaxed uppercase tracking-widest text-[0.8rem]">
-                        The ultimate digital toolbox for board game enthusiasts. Simple, beautiful, and completely free.
+                    <p className="text-xl md:text-2xl text-black dark:text-white font-black max-w-xl mb-12 leading-none uppercase tracking-tighter italic">
+                        The ultimate digital toolbox for enthusiasts. <br />
+                        <span className="text-black/30 dark:text-white/20">Ready. Set. Brutal.</span>
                     </p>
 
                     <button
                         onClick={() => document.getElementById('tools-grid').scrollIntoView({ behavior: 'smooth' })}
-                        className="btn-sunset px-10 py-5 text-sm uppercase tracking-widest flex items-center gap-3 mx-auto lg:mx-0"
+                        className="brutal-button bg-[#FF66AA] px-12 py-6 text-2xl flex items-center gap-4 mx-auto lg:mx-0 shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] dark:shadow-[10px_10px_0px_0px_rgba(255,255,255,1)]"
                     >
-                        Explore Tools <ArrowRight className="w-5 h-5" />
+                        EXPLORE CARGO <ArrowRight className="w-8 h-8 stroke-[3px]" />
                     </button>
+                </div>
+
+                {/* Illustration */}
+                <div className="w-full lg:w-1/2 relative group order-1 lg:order-2">
+                    <div className="absolute inset-0 bg-black translate-x-4 translate-y-4 -z-10" />
+                    <img
+                        src="https://img.freepik.com/free-vector/board-game-with-dice-card-game-cartoon-vector-icon-illustration-holiday-object-icon-isolated_138676-7545.jpg"
+                        alt="Friends playing games"
+                        className="w-full h-auto border-[4px] border-black relative z-10"
+                    />
+                    <motion.div
+                        animate={{ rotate: [0, 10, -10, 0] }}
+                        transition={{ repeat: Infinity, duration: 4 }}
+                        className="absolute -top-6 -right-6 w-24 h-24 bg-[#FFD21E] border-[4px] border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-20"
+                    >
+                        <Sparkles className="w-12 h-12 text-black" />
+                    </motion.div>
                 </div>
             </section>
 
             {/* Tools Grid Header */}
-            <div className="mb-12 flex items-center gap-4">
-                <h2 className="text-3xl font-black text-slate-800 tracking-tight">Game Chest</h2>
-                <div className="h-px flex-grow bg-slate-100" />
+            <div className="mb-16 flex flex-col md:flex-row md:items-end gap-6 relative">
+                <h2 className="text-6xl md:text-8xl font-black text-black dark:text-white tracking-tighter uppercase italic leading-none">The Chest</h2>
+                <p className="text-black/40 dark:text-white/30 font-black uppercase tracking-[0.2em] text-xs mb-2 underline underline-offset-8 decoration-[3px]">Pick your weapon of choice</p>
+                <div className="h-[6px] flex-grow bg-black dark:bg-white hidden md:block mb-3" />
             </div>
 
             {/* Tools Grid */}

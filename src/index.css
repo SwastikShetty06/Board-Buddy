@@ -1,40 +1,58 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: 'Fredoka', system-ui, -apple-system, sans-serif;
-  --shadow-playful: 0 20px 50px rgba(0, 0, 0, 0.05);
-  --shadow-playful-hover: 0 40px 100px rgba(0, 0, 0, 0.08);
-  --shadow-sunset: 0 10px 25px rgba(255, 107, 149, 0.3);
+  --font-mono: 'Space Mono', monospace;
+
+  /* Neo-Brutalism Colors */
+  --n-yellow: #FFD21E;
+  --n-pink: #FF66AA;
+  --n-cyan: #00E1FF;
+  --n-green: #33FF77;
+  --n-purple: #9D7AFF;
+  --n-orange: #FF8800;
+
+  --shadow-brutal: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-brutal-lg: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+  --shadow-brutal-hover: 2px 2px 0px 0px rgba(0, 0, 0, 1);
 }
 
 :root {
-  color-scheme: light;
-  --pastel-lavender: #f0f0ff;
-  --pastel-yellow: #fffdf0;
-  --pastel-blue: #f0f9ff;
-  --pastel-green: #f0fff4;
-  --pastel-pink: #fff0f5;
-  --sunset-orange: #ff9d6c;
-  --sunset-pink: #ff6b95;
+  --bg-cream: #FFFBF0;
+  --bg-midnight: #0D0B14;
+  --border-thick: 3px;
+}
+
+.dark {
+  color-scheme: dark;
 }
 
 body {
-  @apply bg-white text-slate-800 antialiased overflow-x-hidden;
+  @apply bg-[#FFFBF0] text-black antialiased overflow-x-hidden transition-colors duration-300;
+  @apply dark:bg-[#0D0B14] dark:text-white;
   font-family: var(--font-sans);
+  background-image: radial-gradient(#00000011 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.dark body {
+  background-image: radial-gradient(#ffffff0a 1px, transparent 1px);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-slate-50;
+  @apply bg-white dark:bg-black border-l-[3px] border-black dark:border-white;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 rounded-full border-2 border-slate-50 hover:bg-slate-300 transition-colors;
+  @apply bg-[#FFD21E] border-[3px] border-black dark:border-white;
 }
 
 /* Selection */
@@ -66,42 +84,31 @@ body {
   perspective: 1000px;
 }
 
-/* Playful Card Style */
-.playful-card {
-  @apply bg-white rounded-[2.5rem] border-0 transition-all duration-500;
-  box-shadow: var(--shadow-playful);
+/* Neo-Brutalism Base Styles */
+.brutal-card {
+  @apply bg-white border-[3px] border-black transition-all duration-200 dark:bg-black dark:border-white;
+  box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
 }
 
-.playful-card:hover {
-  box-shadow: var(--shadow-playful-hover);
+.dark .brutal-card {
+  box-shadow: 8px 8px 0px 0px rgba(255, 255, 255, 1);
 }
 
-/* Sunset Gradient Button */
-.btn-sunset {
-  @apply bg-gradient-to-r from-[#ff9d6c] to-[#ff6b95] text-white font-bold rounded-full transition-all duration-300;
-  box-shadow: var(--shadow-sunset);
+.brutal-card:hover {
+  @apply -translate-x-1 -translate-y-1;
 }
 
-.btn-sunset:hover {
-  @apply scale-105;
+.brutal-button {
+  @apply border-[3px] border-black font-black uppercase tracking-tight transition-all duration-100 active:translate-x-1 active:translate-y-1 active:shadow-none dark:border-white;
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
 }
 
-/* Dice Shapes */
-.triangle-clip {
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-  padding-top: 15%;
+.dark .brutal-button {
+  box-shadow: 4px 4px 0px 0px rgba(255, 255, 255, 1);
 }
 
-.kite-clip {
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-}
-
-.dodeca-clip {
-  clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
-}
-
-.hex-clip {
-  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+.font-scoreboard {
+  font-family: var(--font-mono);
 }
 
 @keyframes roll {
@@ -168,4 +175,44 @@ body {
 
 .animate-float {
   animation: float 5s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+@keyframes stamp {
+  0% {
+    transform: scale(3) rotate(-10deg);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1) rotate(5deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) rotate(5deg);
+    opacity: 1;
+  }
+}
+
+.animate-stamp {
+  animation: stamp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
 }
