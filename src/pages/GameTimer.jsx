@@ -134,33 +134,49 @@ const GameTimer = () => {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <button
+                <motion.div
+                    initial={{ x: 50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                    className="flex items-center gap-3"
+                >
+                    <motion.button
+                        whileHover={{ scale: 1.1, rotate: -15 }}
+                        whileTap={{ scale: 0.9 }}
                         onClick={() => setIsMuted(!isMuted)}
                         className={`w-14 h-14 border-[3px] border-black dark:border-white flex items-center justify-center transition-all ${isMuted ? 'bg-[#FF66AA] text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : 'bg-white dark:bg-black text-black dark:text-white'}`}
                     >
                         {isMuted ? <BellOff className="w-6 h-6" /> : <Bell className="w-6 h-6" />}
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                        whileHover={{ scale: 1.1, rotate: 15 }}
+                        whileTap={{ scale: 0.9 }}
                         onClick={() => setShowSettings(!showSettings)}
                         className={`w-14 h-14 border-[3px] border-black dark:border-white flex items-center justify-center transition-all ${showSettings ? 'bg-[#00E1FF] text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : 'bg-white dark:bg-black text-black dark:text-white'}`}
                     >
                         <Settings className="w-6 h-6" />
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                        whileHover={{ scale: 1.1, rotate: -45, backgroundColor: "#FFD21E" }}
+                        whileTap={{ scale: 0.9, rotate: -90 }}
                         onClick={resetTimer}
-                        className="w-14 h-14 border-[3px] border-black dark:border-white bg-white dark:bg-black text-black dark:text-white flex items-center justify-center transition-all hover:bg-[#FFD21E] hover:text-black cursor-pointer"
+                        className="w-14 h-14 border-[3px] border-black dark:border-white bg-white dark:bg-black text-black dark:text-white flex items-center justify-center transition-all cursor-pointer"
                     >
                         <RotateCcw className="w-6 h-6" />
-                    </button>
-                </div>
+                    </motion.button>
+                </motion.div>
             </div>
 
             {/* Main Content Area */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
 
                 {/* Timer Display */}
-                <div className="lg:col-span-8">
+                <motion.div
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.2 }}
+                    className="lg:col-span-8"
+                >
                     <div className="bg-[#E5E7EB] dark:bg-[#1A1625] border-[6px] border-black dark:border-white p-8 md:p-12 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_2px_rgba(255,255,255,1)] min-h-[500px] flex flex-col items-center justify-center relative overflow-hidden">
 
                         {/* Tray Texture */}
@@ -245,12 +261,14 @@ const GameTimer = () => {
                         {/* Main Interaction Button */}
                         {mode !== 'chess' && (
                             <div className="mt-12 relative z-10">
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.05, y: -4, boxShadow: "8px 8px 0px 0px rgba(0,0,0,1)" }}
+                                    whileTap={{ scale: 0.95, y: 0, boxShadow: "2px 2px 0px 0px rgba(0,0,0,1)" }}
                                     onClick={mode === 'random' && !isActive ? startRandom : toggleTimer}
                                     className={`brutal-button px-16 py-6 text-2xl ${isActive ? 'bg-white dark:bg-black text-black dark:text-white' : 'bg-[#33FF77] text-black'}`}
                                 >
                                     {isActive ? <><Pause className="w-6 h-6" /> STOP</> : <><Play className="w-6 h-6" /> {mode === 'random' ? 'ROLL & START' : 'START TIMER'}</>}
-                                </button>
+                                </motion.button>
                             </div>
                         )}
 
@@ -258,16 +276,21 @@ const GameTimer = () => {
                             <div className="absolute inset-0 bg-white/40 dark:bg-black/40 backdrop-blur-md z-20 flex flex-col items-center justify-center">
                                 <p className="text-black dark:text-white font-black uppercase tracking-[0.2em] mb-8 bg-white dark:bg-black border-[3px] border-black dark:border-white px-6 py-2 rotate-[2deg]">Tap a clock to start</p>
                                 <div className="flex gap-4">
-                                    <button onClick={() => setActivePlayer('A')} className="brutal-button bg-[#9D7AFF] px-8 py-4 text-xs">START P1</button>
-                                    <button onClick={() => setActivePlayer('B')} className="brutal-button bg-[#FF66AA] px-8 py-4 text-xs">START P2</button>
+                                    <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.9 }} onClick={() => setActivePlayer('A')} className="brutal-button bg-[#9D7AFF] px-8 py-4 text-xs font-black">START P1</motion.button>
+                                    <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.9 }} onClick={() => setActivePlayer('B')} className="brutal-button bg-[#FF66AA] px-8 py-4 text-xs font-black">START P2</motion.button>
                                 </div>
                             </div>
                         )}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Settings / Controls Area */}
-                <div className="lg:col-span-4 flex flex-col gap-8">
+                <motion.div
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.3 }}
+                    className="lg:col-span-4 flex flex-col gap-8"
+                >
                     {/* Mode Specific Settings */}
                     <div className="bg-white dark:bg-black p-8 md:p-10 border-[4px] border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] flex-1">
                         <h3 className="text-black dark:text-white font-black mb-8 text-xs uppercase tracking-[0.2em] italic underline underline-offset-4">Settings</h3>
@@ -349,9 +372,9 @@ const GameTimer = () => {
                             </div>
                         )}
                     </div>
-                </div>
+                </motion.div>
             </div>
-        </div>
+        </div >
     );
 };
 

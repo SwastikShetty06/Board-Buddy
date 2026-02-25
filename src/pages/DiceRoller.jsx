@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { RotateCcw, Plus, Trash2, Play, Grid3X3, Layers, ChevronDown } from 'lucide-react';
 
-const Dice = ({ value, sides, rolling, colorClass }) => {
+const Dice = ({ value, sides, rolling, colorClass, onDragEnd }) => {
     // Determine dots for d6
     const renderDots = () => {
         if (sides !== 6) return <span className="text-3xl font-black text-black">{value}</span>;
@@ -20,9 +20,12 @@ const Dice = ({ value, sides, rolling, colorClass }) => {
         return (
             <div className="grid grid-cols-3 gap-2 w-full h-full p-2">
                 {[...Array(9)].map((_, i) => (
-                    <div
+                    <motion.div
                         key={i}
-                        className={`w-2.5 h-2.5 rounded-full ${dots[value]?.includes(i) ? 'bg-black opacity-100' : 'opacity-0'}`}
+                        initial={false}
+                        animate={{ scale: dots[value]?.includes(i) ? 1 : 0, opacity: dots[value]?.includes(i) ? 1 : 0 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        className={`w-2.5 h-2.5 rounded-full bg-black`}
                     />
                 ))}
             </div>
@@ -31,17 +34,26 @@ const Dice = ({ value, sides, rolling, colorClass }) => {
 
     return (
         <motion.div
-            initial={{ scale: 0.5, opacity: 0, rotate: -45 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            exit={{ scale: 0.5, opacity: 0 }}
+            layout
+            initial={{ scale: 0, opacity: 0, rotate: -180, y: -50 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0, y: 0 }}
+            exit={{ scale: 0, opacity: 0, rotate: 180, y: 50 }}
+            transition={{ type: "spring", stiffness: 200, damping: 12, mass: 0.8 }}
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.9, rotate: -10, cursor: "grabbing" }}
+            drag
+            dragConstraints={{ left: -20, right: 20, top: -20, bottom: 20 }}
+            dragElastic={0.4}
+            onDragEnd={onDragEnd}
             className={`
-                w-24 h-24 md:w-28 md:h-28 flex items-center justify-center relative transition-all duration-300
+                w-24 h-24 md:w-28 md:h-28 flex items-center justify-center relative cursor-grab
                 border-[4px] border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]
                 ${rolling ? 'animate-roll' : ''}
                 ${colorClass}
+                z-10 hover:z-20
             `}
         >
-            <div className="relative z-10 flex items-center justify-center inset-0 w-full h-full">
+            <div className="relative z-10 flex items-center justify-center inset-0 w-full h-full pointer-events-none">
                 {renderDots()}
             </div>
 
@@ -118,26 +130,43 @@ const DiceRoller = () => {
     const total = dice.reduce((acc, d) => acc + d.value, 0);
 
     return (
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4 overflow-hidden">
             <div className="mb-12 flex flex-col items-center">
                 <motion.h1
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
+                    initial={{ y: -50, scale: 0.9, opacity: 0, rotate: -2 }}
+                    animate={{ y: 0, scale: 1, opacity: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
                     className="text-6xl md:text-8xl font-black text-black dark:text-white tracking-tighter uppercase italic leading-none mb-4"
                 >
                     Dice Roller
                 </motion.h1>
-                <p className="text-black/60 dark:text-white/40 font-bold uppercase tracking-[0.2em] text-xs">Tap a die to remove, or roll them all!</p>
+                <motion.p
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+                    className="text-black/60 dark:text-white/40 font-bold uppercase tracking-[0.2em] text-xs"
+                >
+                    Tap a die to remove, drag to flick, or roll them all!
+                </motion.p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
                 {/* Roll Area */}
                 <div className="lg:col-span-8">
                     <motion.div
-                        animate={rolling ? { x: [0, -5, 5, -5, 5, 0] } : {}}
-                        transition={{ duration: 0.1, repeat: 6 }}
+                        initial={{ x: -100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.1 }}
+                        whileTap={rolling ? {} : { scale: 0.99 }}
                         className="bg-[#E5E7EB] dark:bg-[#1A1625] border-[6px] border-black dark:border-white p-8 md:p-12 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_2px_rgba(255,255,255,1)] min-h-[450px] flex flex-col items-center justify-center relative overflow-hidden"
                     >
+                        {/* Shaking tray on roll */}
+                        {rolling && (
+                            <motion.div
+                                className="absolute inset-0 pointer-events-none z-50 bg-black/5 dark:bg-white/5"
+                                animate={{ x: [-10, 10, -10, 10, -5, 5, 0], y: [-5, 5, -10, 10, -5, 5, 0] }}
+                                transition={{ duration: 0.5, ease: "linear" }}
+                            />
+                        )}
+
                         {/* Tray Texture */}
                         <div className="absolute inset-0 opacity-[0.05] pointer-events-none"
                             style={{ backgroundImage: 'radial-gradient(#000 2px, transparent 2px)', backgroundSize: '24px 24px' }}>
@@ -146,78 +175,111 @@ const DiceRoller = () => {
                         <div className="flex flex-wrap justify-center gap-10 mb-16 relative z-10 w-full">
                             <AnimatePresence>
                                 {dice.map((d) => (
-                                    <div key={d.id} className="relative group">
+                                    <div key={d.id} className="relative group perspective-1000">
                                         <Dice
                                             value={d.value}
                                             sides={d.sides}
                                             rolling={rolling}
                                             colorClass={d.color}
+                                            onDragEnd={(_, info) => {
+                                                if (Math.abs(info.offset.x) > 100 || Math.abs(info.offset.y) > 100) {
+                                                    removeDice(d.id);
+                                                }
+                                            }}
                                         />
-                                        <button
+                                        <motion.button
+                                            whileHover={{ scale: 1.2, rotate: 90 }}
+                                            whileTap={{ scale: 0.8 }}
                                             onClick={() => removeDice(d.id)}
-                                            className="absolute -top-4 -right-4 w-9 h-9 bg-[#FF66AA] border-[3px] border-black text-black flex items-center justify-center translate-x-1 translate-y-1 shadow-none md:opacity-0 md:group-hover:opacity-100 transition-all hover:scale-110 active:scale-90 z-20"
+                                            className="absolute -top-4 -right-4 w-9 h-9 bg-[#FF66AA] border-[3px] border-black text-black flex items-center justify-center translate-x-1 translate-y-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] opacity-0 group-hover:opacity-100 transition-opacity z-30"
                                             title="Delete die"
                                         >
                                             <Trash2 className="w-5 h-5" />
-                                        </button>
+                                        </motion.button>
                                     </div>
                                 ))}
                             </AnimatePresence>
                             {dice.length === 0 && (
-                                <div className="flex flex-col items-center justify-center py-20 opacity-20 dark:invert">
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 0.2, scale: 1 }}
+                                    className="flex flex-col items-center justify-center py-20 dark:invert"
+                                >
                                     <Layers className="w-24 h-24 mb-4" />
                                     <p className="text-2xl font-black uppercase tracking-widest text-black">Empty Tray</p>
-                                </div>
+                                </motion.div>
                             )}
                         </div>
 
                         {dice.length > 0 && (
-                            <div className="text-center mb-10 w-full animate-bounce-in">
-                                <div className="inline-flex flex-col items-center bg-white dark:bg-black border-[4px] border-black dark:border-white px-10 py-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                                className="text-center mb-10 w-full"
+                            >
+                                <motion.div
+                                    key={total} // Re-animate on total change
+                                    initial={{ scale: 1.2, color: "#FF66AA" }} animate={{ scale: 1, color: "inherit" }}
+                                    transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                                    className="inline-flex flex-col items-center bg-white dark:bg-black border-[4px] border-black dark:border-white px-10 py-4 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)]"
+                                >
                                     <span className="text-black/40 dark:text-white/40 text-[10px] font-black uppercase tracking-widest mb-1">Total Score</span>
                                     <span className="text-7xl font-scoreboard font-black text-black dark:text-white leading-none">{total}</span>
-                                </div>
-                            </div>
+                                </motion.div>
+                            </motion.div>
                         )}
 
-                        <div className="flex flex-wrap items-center justify-center gap-6 relative z-10">
-                            <button
+                        <div className="flex flex-wrap items-center justify-center gap-6 relative z-10 w-full">
+                            <motion.button
+                                whileHover={{ scale: 1.05, y: -4, boxShadow: "8px 8px 0px 0px rgba(0,0,0,1)" }}
+                                whileTap={{ scale: 0.95, y: 0, boxShadow: "2px 2px 0px 0px rgba(0,0,0,1)" }}
                                 onClick={rollDice}
                                 disabled={rolling || dice.length === 0}
-                                className="brutal-button bg-[#FFD21E] px-12 py-6 text-2xl disabled:opacity-50 disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-none min-w-[220px]"
+                                className="brutal-button bg-[#FFD21E] px-12 py-6 text-2xl font-black uppercase tracking-widest border-[4px] border-black dark:border-white text-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] disabled:opacity-50 disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-none min-w-[220px] transition-colors"
                             >
                                 {rolling ? "ROLLING..." : "ROLL THEM"}
-                            </button>
+                            </motion.button>
 
-                            {dice.length > 0 && (
-                                <button
-                                    onClick={() => setDice([])}
-                                    className="brutal-button bg-[#FF8800] w-[76px] h-[76px] flex items-center justify-center"
-                                    title="Empty Tray"
-                                >
-                                    <Trash2 className="w-8 h-8" />
-                                </button>
-                            )}
+                            <AnimatePresence>
+                                {dice.length > 0 && (
+                                    <motion.button
+                                        initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
+                                        whileHover={{ scale: 1.1, rotate: -10, boxShadow: "6px 6px 0px 0px rgba(0,0,0,1)" }}
+                                        whileTap={{ scale: 0.9, rotate: 10, boxShadow: "2px 2px 0px 0px rgba(0,0,0,1)" }}
+                                        onClick={() => setDice([])}
+                                        className="brutal-button bg-[#FF8800] w-[76px] h-[76px] flex items-center justify-center border-[4px] border-black dark:border-white text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]"
+                                        title="Empty Tray"
+                                    >
+                                        <Trash2 className="w-8 h-8" />
+                                    </motion.button>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </motion.div>
                 </div>
 
                 {/* Controls Area */}
                 <div className="lg:col-span-4 flex flex-col gap-10">
-                    <div className="bg-white dark:bg-black border-[4px] border-black dark:border-white p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)]">
+                    <motion.div
+                        initial={{ x: 100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.2 }}
+                        className="bg-white dark:bg-black border-[4px] border-black dark:border-white p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)]"
+                    >
                         <h3 className="text-black dark:text-white font-black mb-6 text-xs uppercase tracking-[0.2em] italic underline underline-offset-4">Add To Tray</h3>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-4">
-                            {[4, 6, 8, 10, 12, 20].map(s => (
-                                <button
+                            {[4, 6, 8, 10, 12, 20].map((s, i) => (
+                                <motion.button
                                     key={s}
+                                    initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 + (i * 0.05), type: "spring" }}
+                                    whileHover={{ scale: 1.05, y: -2, boxShadow: "4px 4px 0px 0px rgba(0,0,0,1)" }}
+                                    whileTap={{ scale: 0.95, y: 0, boxShadow: "1px 1px 0px 0px rgba(0,0,0,1)" }}
                                     onClick={() => addDice(s)}
-                                    className="brutal-button bg-[#00E1FF] py-4 text-xl font-scoreboard"
+                                    className="brutal-button bg-[#00E1FF] py-4 text-xl font-scoreboard border-[3px] border-black dark:border-white text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]"
                                 >
                                     D{s}
-                                </button>
+                                </motion.button>
                             ))}
                         </div>
-                    </div>
+                    </motion.div>
 
                     <div className="bg-white dark:bg-black border-[4px] border-black dark:border-white p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] flex-1">
                         <div className="flex justify-between items-center mb-6">
