@@ -41,20 +41,35 @@ const DeckPage = () => {
 
     return (
         <div className="max-w-6xl mx-auto px-4 md:px-0">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16">
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 100 }}
+                className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16"
+            >
                 <div>
                     <h1 className="text-6xl md:text-8xl font-black text-black dark:text-white tracking-tighter uppercase italic leading-none mb-4">Card Dealer</h1>
                     <p className="text-black/50 dark:text-white/40 font-bold uppercase tracking-[0.2em] text-xs underline underline-offset-4 decoration-[3px]">Virtual Deck Slinger</p>
                 </div>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
                 {/* Dealer Area */}
-                <div className="lg:col-span-4">
+                <motion.div
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 100, delay: 0.1 }}
+                    className="lg:col-span-4"
+                >
                     <CardDealer deck={deck} onDraw={drawCard} onReset={resetDeck} />
-                </div>
+                </motion.div>
 
-                <div className="lg:col-span-8">
+                <motion.div
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 100, delay: 0.2 }}
+                    className="lg:col-span-8"
+                >
                     <div className="bg-[#E5E7EB] dark:bg-[#1A1625] border-[6px] border-black dark:border-white p-8 md:p-12 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_2px_rgba(255,255,255,1)] min-h-[500px] flex flex-col h-full relative overflow-hidden">
 
                         {/* Tray Texture */}
@@ -64,9 +79,14 @@ const DeckPage = () => {
 
                         <div className="flex justify-between items-center mb-10 relative z-10">
                             <h3 className="text-black dark:text-white font-black text-xs uppercase tracking-[0.2em] italic underline underline-offset-4">Drawn History</h3>
-                            <button onClick={() => setDrawnCards([])} className="text-black dark:text-white hover:rotate-[-10deg] transition-transform">
+                            <motion.button
+                                whileHover={{ scale: 1.2, rotate: -45 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => setDrawnCards([])}
+                                className="text-black dark:text-white hover:text-[#00E1FF] transition-colors"
+                            >
                                 <RotateCcw className="w-5 h-5" />
-                            </button>
+                            </motion.button>
                         </div>
 
                         {drawnCards.length === 0 ? (
@@ -100,10 +120,10 @@ const DeckPage = () => {
                                         </motion.div>
                                     ))}
                                 </AnimatePresence>
-                            </div>
+                            </motion.div>
                         )}
                     </div>
-                </div>
+                </motion.div>
             </div>
         </div>
     );
