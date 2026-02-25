@@ -30,21 +30,36 @@ const TeamGen = () => {
 
     return (
         <div className="max-w-6xl mx-auto px-4">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 100 }}
+                className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
+            >
                 <div>
                     <h1 className="text-6xl md:text-8xl font-black text-black dark:text-white tracking-tighter uppercase italic leading-none mb-4">Team Builder</h1>
                     <p className="text-black/50 dark:text-white/40 font-bold uppercase tracking-[0.2em] text-xs">Mix and shuffle players into fair teams!</p>
                 </div>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                <div className="lg:col-span-5 flex flex-col gap-8">
+                <motion.div
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 100, delay: 0.1 }}
+                    className="lg:col-span-5 flex flex-col gap-8"
+                >
                     <div className="bg-white dark:bg-black border-[4px] border-black dark:border-white p-8 md:p-12 shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] dark:shadow-[10px_10px_0px_0px_rgba(255,255,255,1)] relative overflow-hidden">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-black dark:text-white font-black text-xs uppercase tracking-[0.2em] italic underline underline-offset-4">Add Players</h3>
-                            <button onClick={clearAll} className="text-black dark:text-white hover:rotate-180 transition-transform duration-500">
+                            <motion.button
+                                whileHover={{ scale: 1.2, rotate: -45 }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={clearAll}
+                                className="text-black dark:text-white transition-colors"
+                            >
                                 <RotateCcw className="w-5 h-5" />
-                            </button>
+                            </motion.button>
                         </div>
 
                         <textarea
@@ -58,33 +73,44 @@ const TeamGen = () => {
                             <div className="flex items-center justify-between bg-black/5 dark:bg-white/5 p-4 border-[2px] border-black dark:border-white">
                                 <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-black/60 dark:text-white/60">Number of Teams</span>
                                 <div className="flex items-center gap-4">
-                                    <button
+                                    <motion.button
+                                        whileHover={{ scale: 1.1, rotate: -10 }}
+                                        whileTap={{ scale: 0.9 }}
                                         onClick={() => setTeamCount(Math.max(2, teamCount - 1))}
-                                        className="w-10 h-10 border-[2px] border-black bg-white text-black hover:bg-[#FF66AA] active:translate-y-0.5 transition-all flex items-center justify-center"
+                                        className="w-10 h-10 border-[2px] border-black bg-white text-black hover:bg-[#FF66AA] transition-all flex items-center justify-center"
                                     >
                                         <Plus className="w-5 h-5 rotate-45" />
-                                    </button>
+                                    </motion.button>
                                     <span className="text-2xl font-scoreboard font-black text-black dark:text-white w-8 text-center">{teamCount}</span>
-                                    <button
+                                    <motion.button
+                                        whileHover={{ scale: 1.1, rotate: 10 }}
+                                        whileTap={{ scale: 0.9 }}
                                         onClick={() => setTeamCount(Math.min(10, teamCount + 1))}
-                                        className="w-10 h-10 border-[2px] border-black bg-white text-black hover:bg-[#33FF77] active:translate-y-0.5 transition-all flex items-center justify-center"
+                                        className="w-10 h-10 border-[2px] border-black bg-white text-black hover:bg-[#33FF77] transition-all flex items-center justify-center"
                                     >
                                         <Plus className="w-5 h-5" />
-                                    </button>
+                                    </motion.button>
                                 </div>
                             </div>
 
-                            <button
+                            <motion.button
+                                whileHover={{ scale: 1.02, y: -4, boxShadow: "8px 8px 0px 0px rgba(0,0,0,1)" }}
+                                whileTap={{ scale: 0.98, y: 0, boxShadow: "0px 0px 0px 0px rgba(0,0,0,1)" }}
                                 onClick={generateTeams}
                                 className="brutal-button bg-[#FFD21E] w-full py-6 text-xl"
                             >
                                 GENERATE TEAMS
-                            </button>
+                            </motion.button>
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
-                <div className="lg:col-span-7">
+                <motion.div
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 100, delay: 0.2 }}
+                    className="lg:col-span-7"
+                >
                     <AnimatePresence mode="wait">
                         {teams.length === 0 ? (
                             <motion.div
@@ -136,7 +162,7 @@ const TeamGen = () => {
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </div>
+                </motion.div>
             </div>
         </div>
     );
