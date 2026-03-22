@@ -1,55 +1,69 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Trophy, Hand, Timer, Grid3X3, Dices, Users, Heart, Coins, Zap, Layers, Sparkles, ChevronRight, Gamepad2, ArrowRight } from 'lucide-react';
+import { Trophy, Hand, Timer, Grid3X3, Dices, Users, Heart, Coins, Zap, Layers, ChevronRight, ArrowRight, Gamepad2 } from 'lucide-react';
+
+const Marquee = () => {
+    return (
+        <div className="w-full bg-black dark:bg-white py-4 md:py-6 border-y-[4px] border-black dark:border-white overflow-hidden relative z-20 shadow-[0_8px_0px_rgba(0,0,0,1)] dark:shadow-[0_8px_0px_rgba(255,255,255,1)]">
+            <motion.div
+                className="flex whitespace-nowrap"
+                animate={{ x: ["0%", "-50%"] }}
+                transition={{
+                    repeat: Infinity,
+                    ease: "linear",
+                    duration: 20
+                }}
+            >
+                {[...Array(6)].map((_, i) => (
+                    <span key={i} className="text-white dark:text-black font-black text-xl md:text-3xl uppercase tracking-widest mx-6 flex items-center gap-6">
+                        CHOOSE YOUR WEAPON <span className="w-3 h-3 bg-[#FFD21E] shadow-[2px_2px_0_0_rgba(255,255,255,0.5)] dark:shadow-[2px_2px_0_0_rgba(0,0,0,0.5)] inline-block" /> ROLL THE DICE <span className="w-3 h-3 bg-[#33FF77] shadow-[2px_2px_0_0_rgba(255,255,255,0.5)] dark:shadow-[2px_2px_0_0_rgba(0,0,0,0.5)] inline-block" />
+                    </span>
+                ))}
+            </motion.div>
+        </div>
+    );
+};
 
 const ToolCard = ({ tool, index }) => {
-    const { to, title, description, icon: Icon, color, delay } = tool;
+    const { to, title, description, icon: Icon, color } = tool;
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 50, rotate: -5 }}
-            animate={{ opacity: 1, y: 0, rotate: 0 }}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
             transition={{
-                type: "spring",
-                stiffness: 200,
-                damping: 15,
-                delay: index * 0.1
+                duration: 0.4,
+                delay: (index % 4) * 0.1,
+                ease: "easeOut"
             }}
-            whileHover={{ y: -8, x: -8, scale: 1.02, rotate: 2 }}
-            whileTap={{ scale: 0.95, rotate: -2 }}
-            drag
-            dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-            dragElastic={0.2}
-            className="h-full z-10 cursor-grab active:cursor-grabbing"
+            className="h-full z-10"
         >
             <Link
                 to={to}
-                className="group relative flex flex-col items-center text-center bg-white dark:bg-black border-[4px] border-black dark:border-white p-8 h-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] hover:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[16px_16px_2px_rgba(255,255,255,1)] transition-shadow duration-300"
+                className="group flex flex-col items-center text-center bg-white dark:bg-[#111] border-[4px] border-black dark:border-white p-6 md:p-8 h-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[12px_12px_0px_rgba(255,255,255,1)] hover:-translate-y-2 hover:-translate-x-2 transition-all duration-300"
             >
-                <motion.div
-                    className={`w-16 h-16 border-[4px] border-black flex items-center justify-center mb-6 ${color} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}
-                    whileHover={{ rotate: 15, scale: 1.1 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                <div
+                    className={`w-20 h-20 border-[4px] border-black flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:scale-110 transition-transform ${color}`}
                 >
-                    <Icon className="w-8 h-8 text-black" />
-                </motion.div>
+                    <Icon className="w-10 h-10 text-black stroke-[2.5]" />
+                </div>
 
-                <h3 className="text-xl font-black text-black dark:text-white mb-3 tracking-tighter uppercase italic">
+                <h3 className="text-xl md:text-2xl font-black text-black dark:text-white mb-3 tracking-tighter uppercase italic">
                     {title}
                 </h3>
 
-                <p className="text-black/50 dark:text-white/40 text-xs leading-tight mb-6 font-bold uppercase tracking-wider">
+                <p className="text-black/70 dark:text-white/70 text-sm leading-tight mb-8 font-bold uppercase tracking-wider">
                     {description}
                 </p>
 
-                <div className="mt-auto pt-4 w-full border-t-[3px] border-black/10 dark:border-white/10 flex justify-center group-hover:border-black dark:group-hover:border-white transition-colors">
-                    <motion.span
-                        className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 text-black dark:text-white"
-                        whileHover={{ x: 5 }}
+                <div className="mt-auto pt-4 w-full border-t-[4px] border-black dark:border-white border-dashed flex justify-center">
+                    <span
+                        className="text-[12px] font-black uppercase tracking-[0.2em] flex items-center gap-2 text-black dark:text-white"
                     >
-                        Launch <ChevronRight className="w-4 h-4" />
-                    </motion.span>
+                        Launch <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
                 </div>
             </Link>
         </motion.div>
@@ -64,15 +78,13 @@ const Home = () => {
             description: "Friendly bingo caller for family game nights.",
             icon: Grid3X3,
             color: "bg-[#9D7AFF]",
-            delay: 100
         },
         {
             to: "/dice",
-            title: "3D Dice Roller",
+            title: "3D Dice",
             description: "Roll the dice with a single friendly tap!",
             icon: Dices,
             color: "bg-[#FFD21E]",
-            delay: 200
         },
         {
             to: "/score",
@@ -80,15 +92,13 @@ const Home = () => {
             description: "Keep track of winners and high scores easily.",
             icon: Trophy,
             color: "bg-[#00E1FF]",
-            delay: 300
         },
         {
             to: "/finger",
-            title: "Who Goes First?",
+            title: "Who's First?",
             description: "Let the app decide who starts the fun.",
             icon: Hand,
             color: "bg-[#33FF77]",
-            delay: 400
         },
         {
             to: "/timer",
@@ -96,7 +106,6 @@ const Home = () => {
             description: "Stay on track with our friendly game clock.",
             icon: Timer,
             color: "bg-[#FF66AA]",
-            delay: 500
         },
         {
             to: "/team",
@@ -104,7 +113,6 @@ const Home = () => {
             description: "Shuffle teams fairly for everyone to play.",
             icon: Users,
             color: "bg-[#FF8800]",
-            delay: 600
         },
         {
             to: "/life",
@@ -112,7 +120,6 @@ const Home = () => {
             description: "Track your health in competitive card duels.",
             icon: Heart,
             color: "bg-[#FF6B95]",
-            delay: 700
         },
         {
             to: "/coin",
@@ -120,7 +127,6 @@ const Home = () => {
             description: "Heads or Tails? Flip the magic coin.",
             icon: Coins,
             color: "bg-[#00FFCC]",
-            delay: 800
         },
         {
             to: "/buzzer",
@@ -128,7 +134,6 @@ const Home = () => {
             description: "Be the first to buzz in for game shows!",
             icon: Zap,
             color: "bg-[#FFCC00]",
-            delay: 900
         },
         {
             to: "/deck",
@@ -136,108 +141,115 @@ const Home = () => {
             description: "Draw cards from a complete virtual deck.",
             icon: Layers,
             color: "bg-[#BB88FF]",
-            delay: 1000
         }
     ];
 
     return (
-        <div className="relative">
-            {/* Split Hero Section */}
-            <section className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20 pt-10 pb-24 overflow-hidden">
-                {/* Content */}
-                <div className="w-full lg:w-1/2 text-center lg:text-left order-2 lg:order-1 relative z-10">
-                    <motion.h1
-                        initial={{ x: -150, opacity: 0, rotate: -5 }}
-                        animate={{ x: 0, opacity: 1, rotate: 0 }}
-                        transition={{ type: "spring", stiffness: 100, damping: 12 }}
-                        className="text-6xl md:text-9xl font-black tracking-tighter text-black dark:text-white mb-6 leading-[0.8] uppercase italic"
-                    >
-                        Level Up<br />
-                        <motion.span
-                            className="bg-[#FFD21E] dark:bg-[#FFD21E] text-black px-4 py-2 border-[6px] border-black dark:border-white inline-block mt-4 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] rotate-[-2deg] cursor-grab active:cursor-grabbing"
-                            drag
-                            dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                            dragElastic={0.5}
-                            whileHover={{ scale: 1.05, rotate: 2 }}
-                            whileTap={{ scale: 0.95, rotate: -5 }}
+        <div className="relative min-h-screen selection:bg-[#FFD21E] selection:text-black">
+
+            {/* Hero Section */}
+            <section className="relative pt-16 md:pt-24 pb-20 md:pb-32 px-6 max-w-7xl mx-auto overflow-hidden">
+                <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+                    {/* Hero Content */}
+                    <div className="w-full lg:w-1/2 text-center lg:text-left z-10 flex flex-col items-center lg:items-start">
+                        <motion.h1
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, ease: "easeOut" }}
+                            className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter text-black dark:text-white mb-4 leading-[0.8] uppercase italic"
                         >
-                            Game Night
-                        </motion.span>
-                    </motion.h1>
+                            LEVEL UP
+                        </motion.h1>
 
-                    <motion.p
-                        initial={{ x: -100, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 100, damping: 12, delay: 0.2 }}
-                        className="text-xl md:text-2xl text-black dark:text-white font-black max-w-xl mb-12 leading-none uppercase tracking-tighter italic"
-                    >
-                        The ultimate digital toolbox for enthusiasts. <br />
-                        <span className="text-black/30 dark:text-white/20">Ready. Set. Brutal.</span>
-                    </motion.p>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                            className="bg-[#FFD21E] text-black px-6 py-2 border-[4px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rotate-[-2deg] mb-8 text-3xl sm:text-4xl md:text-5xl font-black uppercase italic inline-block"
+                        >
+                            GAME NIGHT
+                        </motion.div>
 
-                    <motion.button
-                        initial={{ y: 50, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 150, damping: 10, delay: 0.4 }}
-                        whileHover={{ scale: 1.05, y: -5, boxShadow: "16px 16px 0px 0px rgba(0,0,0,1)" }}
-                        whileTap={{ scale: 0.95, y: 0, boxShadow: "4px 4px 0px 0px rgba(0,0,0,1)" }}
-                        onClick={() => document.getElementById('tools-grid').scrollIntoView({ behavior: 'smooth' })}
-                        className="brutal-button bg-[#FF66AA] px-12 py-6 text-2xl flex items-center gap-4 mx-auto lg:mx-0 shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] dark:shadow-[10px_10px_0px_0px_rgba(255,255,255,1)] border-[4px] border-black dark:border-white text-black font-black uppercase tracking-widest transition-all"
-                    >
-                        EXPLORE CARGO <ArrowRight className="w-8 h-8 stroke-[3px]" />
-                    </motion.button>
-                </div>
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                            className="text-xl sm:text-2xl md:text-3xl text-black dark:text-white font-black max-w-xl mb-12 leading-tight uppercase tracking-tighter italic"
+                        >
+                            The ultimate toolkit for board game champions. <br />
+                            <span className="text-[#FF66AA] dark:text-[#FF66AA]">Simple. Fast. Brutal.</span>
+                        </motion.p>
 
-                {/* Illustration */}
-                <motion.div
-                    className="w-full lg:w-1/2 relative group order-1 lg:order-2"
-                    initial={{ scale: 0.8, opacity: 0, rotate: 10 }}
-                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                    transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.3 }}
-                >
-                    <div className="absolute inset-0 bg-black translate-x-4 translate-y-4 -z-10 transition-transform duration-300 group-hover:translate-x-6 group-hover:translate-y-6" />
-                    <motion.img
-                        drag
-                        dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                        dragElastic={0.1}
-                        src="https://img.freepik.com/free-vector/board-game-with-dice-card-game-cartoon-vector-icon-illustration-holiday-object-icon-isolated_138676-7545.jpg"
-                        alt="Friends playing games"
-                        className="w-full h-auto border-[4px] border-black relative z-10 cursor-grab active:cursor-grabbing hover:rotate-1 transition-transform duration-300 bg-white"
-                        style={{ filter: "saturate(1.2) contrast(1.1)" }}
-                    />
+                        <motion.button
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
+                            onClick={() => document.getElementById('tools-grid').scrollIntoView({ behavior: 'smooth' })}
+                            className="group bg-[#00E1FF] px-8 py-5 md:px-12 md:py-6 text-xl md:text-2xl flex items-center gap-4 text-black font-black uppercase tracking-widest border-[4px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 transition-all"
+                        >
+                            Unlock Chest <ArrowRight className="w-8 h-8 stroke-[3px] group-hover:translate-x-2 transition-transform" />
+                        </motion.button>
+                    </div>
+
+                    {/* Hero Illustration */}
                     <motion.div
-                        animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.1, 1] }}
-                        transition={{ repeat: Infinity, duration: 3 }}
-                        drag
-                        dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                        className="absolute -top-6 -right-6 w-24 h-24 bg-[#FFD21E] border-[4px] border-black flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-20 cursor-grab active:cursor-grabbing"
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="w-full lg:w-1/2 relative"
                     >
-                        <Sparkles className="w-12 h-12 text-black" />
+                        {/* Decorative Background Block */}
+                        <div className="absolute inset-0 bg-[#FF66AA] translate-x-4 translate-y-4 md:translate-x-6 md:translate-y-6 -z-10 border-[4px] border-black" />
+
+                        {/* Main Image */}
+                        <div className="relative border-[4px] border-black bg-white overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-2">
+                            <img
+                                src="https://img.freepik.com/free-vector/board-game-with-dice-card-game-cartoon-vector-icon-illustration-holiday-object-icon-isolated_138676-7545.jpg"
+                                alt="Board Game Illustration"
+                                className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
+                                style={{ filter: "saturate(1.2)" }}
+                            />
+                        </div>
+
+                        {/* Floating Badge */}
+                        <motion.div
+                            animate={{ y: [-10, 10, -10] }}
+                            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                            className="absolute -top-6 -right-6 md:-top-10 md:-right-10 w-24 h-24 md:w-32 md:h-32 bg-[#33FF77] border-[4px] border-black rounded-full flex items-center justify-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] z-20"
+                        >
+                            <Gamepad2 className="w-12 h-12 md:w-16 md:h-16 text-black" strokeWidth={2} />
+                        </motion.div>
                     </motion.div>
-                </motion.div>
+                </div>
             </section>
 
-            {/* Tools Grid Header */}
-            <div className="mb-16 flex flex-col md:flex-row md:items-end gap-6 relative">
-                <h2 className="text-6xl md:text-8xl font-black text-black dark:text-white tracking-tighter uppercase italic leading-none">The Chest</h2>
-                <p className="text-black/40 dark:text-white/30 font-black uppercase tracking-[0.2em] text-xs mb-2 underline underline-offset-8 decoration-[3px]">Pick your weapon of choice</p>
-                <div className="h-[6px] flex-grow bg-black dark:bg-white hidden md:block mb-3" />
-            </div>
+            <Marquee />
 
-            {/* Tools Grid */}
-            <div id="tools-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                {tools.map((tool, index) => (
-                    <ToolCard key={tool.to} tool={tool} index={index} />
-                ))}
-            </div>
+            {/* Tools Section */}
+            <section className="max-w-7xl mx-auto px-6 pt-20 pb-32">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="mb-16 md:mb-20 flex flex-col md:flex-row md:items-end gap-4 md:gap-6 relative"
+                >
+                    <h2 className="text-6xl md:text-8xl lg:text-9xl font-black text-black dark:text-white tracking-tighter uppercase italic leading-none">
+                        THE CHEST
+                    </h2>
+                    <p className="text-black/60 dark:text-white/60 font-black uppercase tracking-[0.2em] text-sm md:text-xl md:mb-2 md:pb-2 border-l-[4px] md:border-l-0 md:border-b-[4px] border-black dark:border-white pl-4 md:pl-0">
+                        Select an app
+                    </p>
+                    <div className="h-[8px] flex-grow bg-black dark:bg-white hidden md:block md:mb-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]" />
+                </motion.div>
 
-            {/* Floating Decorative Elements */}
-            <div className="fixed top-40 right-[-5%] -z-10 opacity-10 animate-float">
-                <Dices className="w-64 h-64 text-indigo-200 -rotate-12" />
-            </div>
-            <div className="fixed bottom-20 left-[-5%] -z-10 opacity-10 animate-float delay-1000">
-                <Trophy className="w-48 h-48 text-yellow-200 rotate-12" />
-            </div>
+                {/* Grid */}
+                <div id="tools-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10">
+                    {tools.map((tool, index) => (
+                        <ToolCard key={tool.to} tool={tool} index={index} />
+                    ))}
+                </div>
+            </section>
+
         </div>
     );
 };
