@@ -63,7 +63,7 @@ const Layout = ({ children }) => {
             </div>
 
             {/* Main Content */}
-            <main className="pt-32 pb-32 px-4 max-w-7xl mx-auto min-h-screen relative z-10">
+            <main className={location.pathname === '/' ? "w-full min-h-screen relative z-10" : "pt-32 pb-32 px-4 max-w-7xl mx-auto min-h-screen relative z-10"}>
                 {children}
             </main>
 
