@@ -36,8 +36,8 @@ const Layout = ({ children }) => {
             <div className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4">
                 <header className="bg-white dark:bg-black border-[3px] border-black dark:border-white h-16 rounded-none flex items-center justify-between px-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] w-full max-w-5xl">
                     <Link to="/" className="flex items-center gap-3 group">
-                        <div className="w-10 h-10 bg-[#FFD21E] border-[2px] border-black flex items-center justify-center transition-transform group-hover:rotate-12">
-                            <Gamepad2 className="w-6 h-6 text-black" />
+                        <div className="w-10 h-10 bg-[#FFD21E] border-[2px] border-black flex items-center justify-center transition-transform group-hover:rotate-12 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                            <Dices className="w-6 h-6 text-black" />
                         </div>
                         <span className="font-black text-2xl tracking-tighter uppercase italic">
                             Board Buddy
