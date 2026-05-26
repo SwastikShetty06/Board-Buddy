@@ -28,6 +28,12 @@
   --border-thick: 3px;
 }
 
+html,
+body {
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+}
+
 .dark {
   color-scheme: dark;
 }

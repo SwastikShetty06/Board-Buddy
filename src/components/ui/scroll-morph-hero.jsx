@@ -45,8 +45,8 @@ function FlipCard({
             }}
             transition={{
                 type: "spring",
-                stiffness: 40,
-                damping: 15,
+                stiffness: 100,
+                damping: 38,
             }}
             onClick={onCardClick}
             style={{
@@ -277,26 +277,29 @@ export default function ScrollMorphHero({ items = [] }) {
         };
     }, [virtualScroll]);
 
+    // Unified wobble-free, critically-damped spring configuration
+    const springConfig = { stiffness: 90, damping: 40, mass: 1 };
+
     // 1. Morph Progress: 0 (Circle) -> 1 (Bottom Arc)
     const morphProgress = useTransform(virtualScroll, [0, 1000], [0, 1]);
-    const smoothMorph = useSpring(morphProgress, { stiffness: 40, damping: 20 });
+    const smoothMorph = useSpring(morphProgress, springConfig);
 
     // 2. Scroll Rotation (Shuffling)
     const scrollRotate = useTransform(virtualScroll, [1000, 3000], [0, 360]);
-    const smoothScrollRotate = useSpring(scrollRotate, { stiffness: 40, damping: 20 });
+    const smoothScrollRotate = useSpring(scrollRotate, springConfig);
 
     // 3. Grid Formation
     const gridProgress = useTransform(virtualScroll, [3000, 4500], [0, 1]);
-    const smoothGrid = useSpring(gridProgress, { stiffness: 40, damping: 15 });
+    const smoothGrid = useSpring(gridProgress, springConfig);
 
     // 3.5. Grid Scrolling (Active on mobile viewports to prevent overflow cutoff)
     const gridScrollProgress = useTransform(virtualScroll, [4800, 9500], [0, 1]);
-    const smoothGridScroll = useSpring(gridScrollProgress, { stiffness: 40, damping: 20 });
+    const smoothGridScroll = useSpring(gridScrollProgress, springConfig);
 
     // 4. Line Path & Footer Slide
     const lineProgress = useTransform(virtualScroll, [0, 12000], [0, 1]);
     const footerY = useTransform(virtualScroll, [10200, 12000], ["100%", "0%"]);
-    const smoothFooterY = useSpring(footerY, { stiffness: 60, damping: 20 });
+    const smoothFooterY = useSpring(footerY, springConfig);
     
     // SVG Dynamic Movement
     const lineX = useTransform(virtualScroll, [0, 6000, 12000], ["0%", "20%", "0%"]);
