@@ -3,6 +3,7 @@ import { motion, useTransform, useSpring, useMotionValue } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Star, Sparkles, Hexagon, CircleDashed, Github, Mail, Linkedin, MapPin, Code2 } from "lucide-react";
 import { LinePath } from "./svg-follow-scroll";
+import { Boxes } from "./background-boxes";
 
 // --- Utility ---
 const lerp = (start, end, t) => start * (1 - t) + end * t;
@@ -17,6 +18,7 @@ function FlipCard({
     total,
     phase,
     target,
+    onCardClick,
 }) {
     const navigate = useNavigate();
     const [isHovered, setIsHovered] = useState(false);
@@ -27,6 +29,13 @@ function FlipCard({
             onMouseLeave={() => setIsHovered(false)}
             onPointerDown={() => setIsHovered(true)}
             onPointerUp={() => setIsHovered(false)}
+            initial={{
+                x: target.x,
+                y: target.y,
+                rotate: target.rotation,
+                scale: 0,
+                opacity: 0,
+            }}
             animate={{
                 x: target.x,
                 y: target.y,
@@ -39,7 +48,7 @@ function FlipCard({
                 stiffness: 40,
                 damping: 15,
             }}
-            onClick={() => navigate(item.to)}
+            onClick={onCardClick}
             style={{
                 position: "absolute",
                 width: IMG_WIDTH,
@@ -47,7 +56,7 @@ function FlipCard({
                 transformStyle: "preserve-3d",
                 perspective: "1000px",
             }}
-            className="cursor-pointer group z-10 hover:z-50"
+            className="cursor-pointer group z-10 hover:z-50 pointer-events-auto"
         >
             <motion.div
                 className="relative h-full w-full"
@@ -80,13 +89,18 @@ function FlipCard({
 }
 
 // --- Main Hero Component ---
-const MAX_SCROLL = 10000; 
+const MAX_SCROLL = 12000; 
 
 export default function ScrollMorphHero({ items = [] }) {
     const TOTAL_IMAGES = items.length;
-    const [introPhase, setIntroPhase] = useState("scatter");
-    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+    const [introPhase, setIntroPhase] = useState("circle");
+    const [containerSize, setContainerSize] = useState({
+        width: typeof window !== "undefined" ? window.innerWidth : 0,
+        height: typeof window !== "undefined" ? window.innerHeight : 0,
+    });
     const containerRef = useRef(null);
+    const navigate = useNavigate();
+    const isDraggingRef = useRef(false);
 
     // --- Container Size ---
     useEffect(() => {
@@ -124,27 +138,142 @@ export default function ScrollMorphHero({ items = [] }) {
         };
 
         let touchStartY = 0;
-        const handleTouchStart = (e) => {
-            touchStartY = e.touches[0].clientY;
-        };
-        const handleTouchMove = (e) => {
-            const touchY = e.touches[0].clientY;
-            const deltaY = touchStartY - touchY;
-            touchStartY = touchY;
+        let touchStartX = 0;
+        let lastTouchY = 0;
+        let lastTouchTime = 0;
+        let velocityY = 0;
+        let momentumId = null;
+        let touchHistory = []; // Track recent touch points for momentum calculation
 
-            const newScroll = Math.min(Math.max(scrollRef.current + deltaY, 0), MAX_SCROLL);
+        const handleTouchStart = (e) => {
+            const touch = e.touches[0];
+            touchStartY = touch.clientY;
+            touchStartX = touch.clientX;
+            lastTouchY = touchStartY;
+            lastTouchTime = performance.now();
+            velocityY = 0;
+            isDraggingRef.current = false;
+            touchHistory = [{ y: touchStartY, time: lastTouchTime }];
+
+            if (momentumId) {
+                cancelAnimationFrame(momentumId);
+                momentumId = null;
+            }
+        };
+
+        const handleTouchMove = (e) => {
+            const touch = e.touches[0];
+            const touchY = touch.clientY;
+            const touchX = touch.clientX;
+            const currentTime = performance.now();
+
+            const deltaY = lastTouchY - touchY;
+            const deltaX = touchStartX - touchX;
+
+            // Sensitivity factor for touchscreen drags - boosted on mobile for speed
+            const isMobileDevice = typeof window !== "undefined" && window.innerWidth < 768;
+            const touchMultiplier = isMobileDevice ? 8.0 : 2.0;
+            const adjustedDeltaY = deltaY * touchMultiplier;
+
+            if (Math.abs(touchStartY - touchY) > 8 || Math.abs(deltaX) > 8) {
+                isDraggingRef.current = true;
+            }
+
+            // Prevent default browser scrolling and bouncing
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+
+            // Record touch in history
+            touchHistory.push({ y: touchY, time: currentTime });
+            
+            // Clean up history to keep only the last 150ms
+            const cutoff = currentTime - 150;
+            while (touchHistory.length > 2 && touchHistory[0].time < cutoff) {
+                touchHistory.shift();
+            }
+
+            lastTouchY = touchY;
+            lastTouchTime = currentTime;
+
+            const newScroll = Math.min(Math.max(scrollRef.current + adjustedDeltaY, 0), MAX_SCROLL);
             scrollRef.current = newScroll;
             virtualScroll.set(newScroll);
         };
 
+        const handleTouchEnd = () => {
+            const currentTime = performance.now();
+            const cutoff = currentTime - 150;
+            
+            // Filter touch history to the last 150ms
+            const recentTouches = touchHistory.filter(t => t.time >= cutoff);
+            
+            const isMobileDevice = typeof window !== "undefined" && window.innerWidth < 768;
+            if (recentTouches.length >= 2) {
+                const first = recentTouches[0];
+                const last = recentTouches[recentTouches.length - 1];
+                const duration = last.time - first.time;
+                
+                if (duration > 10) {
+                    // Velocity = (distance scrolled) / duration
+                    const distanceScrolled = first.y - last.y;
+                    const touchMultiplier = isMobileDevice ? 8.0 : 2.0;
+                    velocityY = (distanceScrolled * touchMultiplier) / duration;
+                } else {
+                    velocityY = 0;
+                }
+            } else {
+                velocityY = 0;
+            }
+
+            // Apply momentum scrolling
+            let momentum = velocityY * 16.67; // approx. pixels per frame (assuming 60fps)
+            
+            if (isMobileDevice) {
+                momentum *= 2.5; // Boost mobile touch momentum scroll
+            }
+
+            // Limit momentum to a generous max to allow smooth, fast scrolling when flicked hard
+            const maxMomentum = isMobileDevice ? 400 : 180;
+            if (momentum > maxMomentum) momentum = maxMomentum;
+            if (momentum < -maxMomentum) momentum = -maxMomentum;
+
+            // Use a smooth friction factor (0.97 is perfect for fluid scrolling)
+            const friction = 0.97;
+
+            const animateMomentum = () => {
+                if (Math.abs(momentum) < 0.1) {
+                    cancelAnimationFrame(momentumId);
+                    momentumId = null;
+                    return;
+                }
+
+                const newScroll = Math.min(Math.max(scrollRef.current + momentum, 0), MAX_SCROLL);
+                scrollRef.current = newScroll;
+                virtualScroll.set(newScroll);
+
+                momentum *= friction;
+                momentumId = requestAnimationFrame(animateMomentum);
+            };
+
+            if (Math.abs(momentum) > 0.5) {
+                momentumId = requestAnimationFrame(animateMomentum);
+            }
+        };
+
         container.addEventListener("wheel", handleWheel, { passive: false });
-        container.addEventListener("touchstart", handleTouchStart, { passive: false });
+        container.addEventListener("touchstart", handleTouchStart, { passive: true });
         container.addEventListener("touchmove", handleTouchMove, { passive: false });
+        container.addEventListener("touchend", handleTouchEnd, { passive: true });
 
         return () => {
             container.removeEventListener("wheel", handleWheel);
             container.removeEventListener("touchstart", handleTouchStart);
             container.removeEventListener("touchmove", handleTouchMove);
+            container.removeEventListener("touchend", handleTouchEnd);
+            if (momentumId) {
+                cancelAnimationFrame(momentumId);
+            }
         };
     }, [virtualScroll]);
 
@@ -153,23 +282,23 @@ export default function ScrollMorphHero({ items = [] }) {
     const smoothMorph = useSpring(morphProgress, { stiffness: 40, damping: 20 });
 
     // 2. Scroll Rotation (Shuffling)
-    const scrollRotate = useTransform(virtualScroll, [1000, 3500], [0, 360]);
+    const scrollRotate = useTransform(virtualScroll, [1000, 3000], [0, 360]);
     const smoothScrollRotate = useSpring(scrollRotate, { stiffness: 40, damping: 20 });
 
     // 3. Grid Formation
-    const gridProgress = useTransform(virtualScroll, [3500, 5500], [0, 1]);
+    const gridProgress = useTransform(virtualScroll, [3000, 4500], [0, 1]);
     const smoothGrid = useSpring(gridProgress, { stiffness: 40, damping: 15 });
 
     // 4. Line Path & Footer Slide
-    const lineProgress = useTransform(virtualScroll, [0, 10000], [0, 1]);
-    const footerY = useTransform(virtualScroll, [8500, 10000], ["100%", "0%"]);
+    const lineProgress = useTransform(virtualScroll, [0, 12000], [0, 1]);
+    const footerY = useTransform(virtualScroll, [10200, 12000], ["100%", "0%"]);
     const smoothFooterY = useSpring(footerY, { stiffness: 60, damping: 20 });
     
     // SVG Dynamic Movement
-    const lineX = useTransform(virtualScroll, [0, 5000, 10000], ["0%", "20%", "0%"]);
-    const lineY = useTransform(virtualScroll, [0, 5000, 10000], ["-20%", "20%", "40%"]);
-    const lineScale = useTransform(virtualScroll, [0, 2000, 10000], [2.5, 1.5, 1.2]);
-    const lineOpacity = useTransform(virtualScroll, [0, 1000, 8500, 10000], [0.8, 0.4, 0.4, 0.9]);
+    const lineX = useTransform(virtualScroll, [0, 6000, 12000], ["0%", "20%", "0%"]);
+    const lineY = useTransform(virtualScroll, [0, 6000, 12000], ["-20%", "20%", "40%"]);
+    const lineScale = useTransform(virtualScroll, [0, 2000, 12000], [2.5, 1.5, 1.2]);
+    const lineOpacity = useTransform(virtualScroll, [0, 1000, 10200, 12000], [0.8, 0.4, 0.4, 0.9]);
 
     // --- Mouse Parallax ---
     const mouseX = useMotionValue(0);
@@ -190,23 +319,9 @@ export default function ScrollMorphHero({ items = [] }) {
     }, [mouseX]);
 
     // --- Intro Sequence ---
-    useEffect(() => {
-        const timer1 = setTimeout(() => setIntroPhase("line"), 500);
-        const timer2 = setTimeout(() => setIntroPhase("circle"), 2000);
-        return () => { clearTimeout(timer1); clearTimeout(timer2); };
-    }, []);
+    // Instantly starting from circle phase as requested by user
 
-    // --- Random Scatter Positions ---
-    const scatterPositions = useMemo(() => {
-        const isMob = window.innerWidth < 768;
-        return items.map(() => ({
-            x: (Math.random() - 0.5) * 1500,
-            y: (Math.random() - 0.5) * 1000,
-            rotation: (Math.random() - 0.5) * 180,
-            scale: isMob ? 0.4 : 0.6,
-            opacity: 0,
-        }));
-    }, [items]);
+    // Removed unused scatterPositions memo
 
     // --- Render Loop (Manual Calculation for Morph) ---
     const [morphValue, setMorphValue] = useState(0);
@@ -235,20 +350,25 @@ export default function ScrollMorphHero({ items = [] }) {
     return (
         <div ref={containerRef} className="relative w-full h-[100dvh] touch-none selection:bg-[#FFD21E] selection:text-black overflow-hidden bg-transparent">
             
-            {/* Background Decorative Parallax Elements */}
-            <div className="absolute inset-0 z-0 bg-noise pointer-events-none mix-blend-multiply dark:mix-blend-lighten" />
-            <motion.div 
-                className="absolute inset-0 z-0 pointer-events-none"
-                style={{ 
-                    x: lineX, 
-                    y: lineY, 
-                    scale: lineScale, 
-                    opacity: lineOpacity,
-                    rotate: 12
-                }}
-            >
-                 <LinePath progress={lineProgress} className="h-full w-full object-cover" />
-            </motion.div>
+            {/* Interactive Background Boxes (Light Mode optimized with Dark Mode fallback) */}
+            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-noise mix-blend-multiply dark:mix-blend-lighten" />
+            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-auto">
+                <Boxes className="opacity-80 dark:opacity-45" />
+                {/* Radial gradient mask to fade the boxes toward the edges in light mode */}
+                <div 
+                    className="absolute inset-0 w-full h-full pointer-events-none"
+                    style={{
+                        background: "radial-gradient(circle at center, transparent 20%, #FFFBF0 80%)",
+                    }}
+                />
+                {/* Radial gradient mask to fade the boxes toward the edges in dark mode */}
+                <div 
+                    className="absolute inset-0 w-full h-full pointer-events-none hidden dark:block"
+                    style={{
+                        background: "radial-gradient(circle at center, transparent 20%, #0D0B14 80%)",
+                    }}
+                />
+            </div>
             <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center z-0">
                 <motion.div 
                     className="absolute top-[15%] left-[20%] text-black dark:text-white opacity-20"
@@ -279,7 +399,7 @@ export default function ScrollMorphHero({ items = [] }) {
             </div>
 
             {/* Container */}
-            <div className="flex h-full w-full flex-col items-center justify-center perspective-1000">
+            <div className="flex h-full w-full flex-col items-center justify-center perspective-1000 pointer-events-none">
 
                 {/* Intro Text */}
                 <div className="absolute z-0 flex flex-col items-center justify-center text-center pointer-events-none top-1/2 -translate-y-1/2 w-full px-4">
@@ -303,7 +423,7 @@ export default function ScrollMorphHero({ items = [] }) {
                 
                 {/* Scroll Down Prompt - Always visible initially, fades out when grid completely forms */}
                 <motion.div 
-                    className="absolute bottom-10 z-0 flex flex-col items-center font-bold tracking-[0.2em] text-black dark:text-white uppercase text-xs"
+                    className="absolute bottom-10 z-0 flex flex-col items-center font-bold tracking-[0.2em] text-black dark:text-white uppercase text-xs pointer-events-none"
                     animate={{ opacity: 1 - gridValue }}
                 >
                     <span>Scroll to Unlock</span>
@@ -315,19 +435,15 @@ export default function ScrollMorphHero({ items = [] }) {
                 </motion.div>
 
                 {/* Main Container for Cards */}
-                <div className="relative flex items-center justify-center w-full h-full pt-10">
+                <div className="relative flex items-center justify-center w-full h-full pt-10 pointer-events-none">
                     {items.map((item, i) => {
                         let target = { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1 };
 
                         const baseScale = isMobile ? 0.6 : 1;
 
-                        if (introPhase === "scatter") {
-                            target = scatterPositions[i];
-                        } else if (introPhase === "line") {
-                            const lineSpacing = IMG_WIDTH + 20; 
-                            const lineTotalWidth = TOTAL_IMAGES * lineSpacing;
-                            const lineX = i * lineSpacing - lineTotalWidth / 2 + (lineSpacing / 2);
-                            target = { x: lineX, y: 0, rotation: 0, scale: baseScale, opacity: 1 };
+                        if (introPhase === "scatter" || introPhase === "line") {
+                            // Fallback paths (no longer used as we start directly in circle)
+                            target = { x: 0, y: 0, rotation: 0, scale: baseScale, opacity: 1 };
                         } else {
                             const minDimension = Math.min(containerSize.width, containerSize.height);
 
@@ -391,7 +507,7 @@ export default function ScrollMorphHero({ items = [] }) {
                             const gridY = (rowIndex * (IMG_HEIGHT + gapY)) - (gridTotalHeight / 2) + (IMG_HEIGHT / 2); 
 
                             // Final target blends from ArcTarget -> GridPos
-                            const fadeOutRange = scrollVal > 8500 ? Math.max(0, 1 - (scrollVal - 8500) / 400) : 1;
+                            const fadeOutRange = scrollVal > 10200 ? Math.max(0, 1 - (scrollVal - 10200) / 600) : 1;
                             target = {
                                 x: lerp(arcTarget.x, gridX, gridValue),
                                 y: lerp(arcTarget.y, gridY, gridValue),
@@ -409,6 +525,10 @@ export default function ScrollMorphHero({ items = [] }) {
                                 total={TOTAL_IMAGES}
                                 phase={introPhase}
                                 target={target}
+                                onCardClick={() => {
+                                    if (isDraggingRef.current) return;
+                                    navigate(item.to);
+                                }}
                             />
                         );
                     })}
