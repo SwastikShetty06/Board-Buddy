@@ -289,6 +289,10 @@ export default function ScrollMorphHero({ items = [] }) {
     const gridProgress = useTransform(virtualScroll, [3000, 4500], [0, 1]);
     const smoothGrid = useSpring(gridProgress, { stiffness: 40, damping: 15 });
 
+    // 3.5. Grid Scrolling (Active on mobile viewports to prevent overflow cutoff)
+    const gridScrollProgress = useTransform(virtualScroll, [4800, 9500], [0, 1]);
+    const smoothGridScroll = useSpring(gridScrollProgress, { stiffness: 40, damping: 20 });
+
     // 4. Line Path & Footer Slide
     const lineProgress = useTransform(virtualScroll, [0, 12000], [0, 1]);
     const footerY = useTransform(virtualScroll, [10200, 12000], ["100%", "0%"]);
@@ -327,6 +331,7 @@ export default function ScrollMorphHero({ items = [] }) {
     const [morphValue, setMorphValue] = useState(0);
     const [rotateValue, setRotateValue] = useState(0);
     const [gridValue, setGridValue] = useState(0);
+    const [gridScrollVal, setGridScrollVal] = useState(0);
     const [parallaxValue, setParallaxValue] = useState(0);
     const [scrollVal, setScrollVal] = useState(0);
 
@@ -334,16 +339,18 @@ export default function ScrollMorphHero({ items = [] }) {
         const unsubscribeMorph = smoothMorph.on("change", setMorphValue);
         const unsubscribeRotate = smoothScrollRotate.on("change", setRotateValue);
         const unsubscribeGrid = smoothGrid.on("change", setGridValue);
+        const unsubscribeGridScroll = smoothGridScroll.on("change", setGridScrollVal);
         const unsubscribeParallax = smoothMouseX.on("change", setParallaxValue);
         const unsubscribeScroll = virtualScroll.on("change", setScrollVal);
         return () => {
             unsubscribeMorph();
             unsubscribeRotate();
             unsubscribeGrid();
+            unsubscribeGridScroll();
             unsubscribeParallax();
             unsubscribeScroll();
         };
-    }, [smoothMorph, smoothScrollRotate, smoothGrid, smoothMouseX, virtualScroll]);
+    }, [smoothMorph, smoothScrollRotate, smoothGrid, smoothGridScroll, smoothMouseX, virtualScroll]);
 
     const isMobile = containerSize.width < 768;
 
@@ -504,7 +511,20 @@ export default function ScrollMorphHero({ items = [] }) {
                             
                             // Calculate centered grid position
                             const gridX = (colIndex * (IMG_WIDTH + gapX)) - (gridTotalWidth / 2) + (IMG_WIDTH / 2) + (parallaxValue * 0.5);
-                            const gridY = (rowIndex * (IMG_HEIGHT + gapY)) - (gridTotalHeight / 2) + (IMG_HEIGHT / 2); 
+                             
+                             let baseGridY = (rowIndex * (IMG_HEIGHT + gapY)) - (gridTotalHeight / 2) + (IMG_HEIGHT / 2);
+                             
+                             // Responsive overflow grid scrolling on mobile devices
+                             if (isMobile && containerSize.height > 0) {
+                                 const actualGridHeight = gridTotalHeight * 0.85;
+                                 const maxScrollableDistance = actualGridHeight - (containerSize.height - 120); // 120px safety padding
+                                 if (maxScrollableDistance > 0) {
+                                     const scrollOffset = (gridScrollVal - 0.5) * maxScrollableDistance;
+                                     baseGridY -= (scrollOffset / 0.85); // adjust for card scale
+                                 }
+                             }
+                             
+                             const gridY = baseGridY; 
 
                             // Final target blends from ArcTarget -> GridPos
                             const fadeOutRange = scrollVal > 10200 ? Math.max(0, 1 - (scrollVal - 10200) / 600) : 1;
